@@ -1,0 +1,1 @@
+<img width="200px" src="{{ asset('assets/img/tasharuk.png') }}" >

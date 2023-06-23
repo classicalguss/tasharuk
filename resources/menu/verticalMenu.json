@@ -1,0 +1,63 @@
+{
+  "menu": [
+    {
+      "name": "Dashboards",
+      "icon": "menu-icon tf-icons bx bx-home-circle",
+      "slug": "dashboard",
+      "url": "/",
+      "otherSlugs": []
+    },
+    {
+      "menuHeader": "Registrations"
+    },
+    {
+      "name": "Users",
+      "icon": "menu-icon tf-icons bx bx-user",
+      "slug": "users",
+      "url": "/users",
+      "otherSlugs": []
+    },
+    {
+      "name": "Schools",
+      "icon": "menu-icon tf-icons bx bxs-school",
+      "slug": "schools",
+      "url": "/schools",
+      "otherSlugs": []
+    },
+    {
+      "menuHeader": "Audit content"
+    },
+    {
+      "name": "Capabilities",
+      "icon": "menu-icon tf-icons bx bxs-color",
+      "slug": "capabilities",
+      "otherSlugs": ["subcapabilities", "indicators"],
+      "url": "/capabilities"
+    },
+    {
+      "name": "Stakeholders",
+      "icon": "menu-icon tf-icons bx bxs-group",
+      "slug": "stakeholders",
+      "otherSlugs": [],
+      "url": "/stakeholders"
+    },
+    {
+      "name": "Surveys",
+      "icon": "menu-icon tf-icons bx bxs-spreadsheet",
+      "slug": "surveys",
+      "submenu": [
+        {
+          "url": "/surveys",
+          "name": "List",
+          "slug": "surveys"
+        },
+        {
+          "url": "surveys/send",
+          "name": "Send",
+          "slug": "surveySend"
+        }
+      ],
+      "otherSlugs": []
+    }
+  ]
+}
