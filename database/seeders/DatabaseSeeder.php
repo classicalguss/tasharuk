@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App;
 use App\Models\School;
 use App\Models\User;
 use App\Models\WebsiteMetrics;
@@ -67,32 +68,36 @@ class DatabaseSeeder extends Seeder
 		$superAdminUser->assignRole($superAdminRole);
 		$adminUser->assignRole($adminRole);
 
-        $ownerUsers = User::factory(25)
-			->sequence(fn (Sequence $sequence) => ['school_id' => ($sequence->index % 25) + 1])
-			->create();
+		if (App::environment('local')) {
+			$ownerUsers = User::factory(25)
+				->sequence(fn (Sequence $sequence) => ['school_id' => ($sequence->index % 25) + 1])
+				->create();
 
-		$minId = $ownerUsers[0]->id;
-		School::factory(25)
-			->sequence(fn (Sequence $sequence) => ['owner_id' => $sequence->index+$minId])
-			->create();
+			$minId = $ownerUsers[0]->id;
+			School::factory(25)
+				->sequence(fn (Sequence $sequence) => ['owner_id' => $sequence->index+$minId])
+				->create();
+		}
 
 		$schoolAdminRole = Role::create(['name' => 'School Owner']);
 		$adminRole = Role::create(['name' => 'School Admin']);
 		$studentRole = Role::create(['name' => 'Student']);
 		$schoolAdminPermission = Permission::create(['name' => 'Add school admin']);
 		$schoolAdminRole->syncPermissions([$schoolAdminPermission]);
-		foreach ($ownerUsers as $ownerUser) {
-			$ownerUser->assignRole($schoolAdminRole);
-			$ownerUser->save();
-		}
-		$otherAdmins = User::factory(50)->create();
-		foreach ($otherAdmins as $admin) {
-			$admin->assignRole($adminRole);
-		}
+		if (App::environment('local')) {
+			foreach ($ownerUsers as $ownerUser) {
+				$ownerUser->assignRole($schoolAdminRole);
+				$ownerUser->save();
+			}
+			$otherAdmins = User::factory(50)->create();
+			foreach ($otherAdmins as $admin) {
+				$admin->assignRole($adminRole);
+			}
 
-		$normalUsers = User::factory(100)->create();
-		foreach ($normalUsers as $admin) {
-			$admin->assignRole($studentRole);
+			$normalUsers = User::factory(100)->create();
+			foreach ($normalUsers as $admin) {
+				$admin->assignRole($studentRole);
+			}
 		}
 
 		$websiteMetrics = new WebsiteMetrics();
