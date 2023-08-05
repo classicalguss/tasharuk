@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class SchoolStakeholderWeight extends Model
 {
     use HasFactory;
+	public $guarded = ['id'];
 }

@@ -159,15 +159,32 @@ class SchoolController extends Controller
     }
 
 	public function storeStakeholderWeights(School $school, Request $request) {
-
+		$weights = $request->post('weights');
+		$schoolId = $request->post('school_id');
+		foreach ($weights as $key => $value) {
+			SchoolStakeholderWeight::updateOrCreate([
+				'school_id' => $schoolId,
+				'stakeholder_id' => $key,
+				'weight' => $value
+			]);
+		}
 		return response()->noContent();
 	}
 
 	public function updateStakeholderWeights(School $school, Request $request) {
-		$stakeholderWeights = SchoolStakeholderWeight::whereSchoolId($school->id);
-		$stakeholders = Stakeholder::all()->toArray();
-		foreach ($stakeholders as &$stakeholder) {
-			$stakeholder['weight'] = intval(100/count($stakeholders));
+		$stakeholderWeights = SchoolStakeholderWeight::whereSchoolId($school->id)->get();
+		$stakeholders = Stakeholder::all();
+
+		//Only show updated stakeholder weights if they have the same stakeholder ids
+		if ($stakeholderWeights->pluck('stakeholder_id')->sort() == $stakeholders->pluck('id')->sort()) {
+			$stakeholderWeights = array_column($stakeholderWeights->toArray(), 'weight', 'stakeholder_id');
+			foreach ($stakeholders as &$stakeholder) {
+				$stakeholder['weight'] = $stakeholderWeights[$stakeholder->id];
+			}
+		} else {
+			foreach ($stakeholders as &$stakeholder) {
+				$stakeholder['weight'] = intval(100/count($stakeholders));
+			}
 		}
 
 		if ($request->expectsJson()) {

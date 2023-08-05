@@ -113,7 +113,7 @@ function updateWeights() {
     for (let i = 0; i < allSliders.length; i++) {
         payloadArray[parseInt(allSliders[i].dataset.reference)] = parseInt(allSliders[i].dataset.weight);
     }
-    let url = '/schools/'+schoolId+'/store-stakeholderufw status-weights'
+    let url = '/schools/'+schoolId+'/store-stakeholder-weights'
     axios({
         method: 'post',
         url: url,
