@@ -2,44 +2,65 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Capability;
+use App\Models\Indicator;
 use App\Models\School;
+use App\Models\Stakeholder;
+use App\Models\Survey;
+use App\Models\SurveyAnswer;
+use App\Models\SurveyScore;
+use App\Models\SurveySubcapabilityScore;
 use Illuminate\Http\Request;
 
 class SchoolController extends Controller
 {
-	/**
-	 * Redirect to user-management view.
-	 *
-	 */
-	public function SchoolManagement()
-	{
-		return view('pages.schools');
-	}
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
+		if (!$request->expectsJson())
+			return view('pages.schools');
+
+		$columns = [
+			0 => 'name',
+		];
 		$limit = $request->input('length');
 		$start = $request->input('start');
+		$order = $request->input('order.0.column');
+		$dir = $request->input('order.0.dir');
 
-		$schools = School::offset($start)
-			->with(['owner', 'admins'])
-			->limit($limit)
-			->get();
+		$totalData = School::count();
+		$totalFiltered = $totalData;
+
+		if (empty($request->input('search.value'))) {
+			$schools = School::offset($start)
+				->with(['owner', 'admins'])
+				->limit($limit);
+		} else {
+			$search = $request->input('search.value');
+
+			$schools = School::where('name', 'LIKE', "%{$search}%")
+				->offset($start)
+				->with(['owner', 'admins'])
+				->limit($limit);
+
+			$totalFiltered = School::where('name', 'LIKE', "%{$search}%")
+				->count();
+		}
+
+		if (!is_null($order) && $dir) {
+			$order = $columns[$order];
+			$schools->orderBy($order, $dir);
+		}
 
 		return response()->json([
+			'draw' => intval($request->input('draw')),
 			'code' => 200,
-			'data' => $schools,
+			'recordsFiltered' => $totalFiltered,
+			'data' => $schools->get(),
+			'recordsTotal' => $totalData
 		]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -47,8 +68,55 @@ class SchoolController extends Controller
      */
     public function store(Request $request)
     {
-        //
+		$validated = $request->validate([
+			'name' => 'required'
+		]);
+		School::create($validated);
+		toastr()->success('School created successfully');
+		return redirect()->back();
     }
+
+	public function generateReport(School $school)
+	{
+		$capabilities = Capability::whereId(1)->get();
+		$surveyIds = Survey::whereSchoolId($school->id)->get()->pluck('id');
+
+		$surveyScores = SurveyScore::selectRaw('capability_id, round(avg(score), 2) as average')
+			->whereIn('survey_id', $surveyIds)->groupBy('capability_id')->get()->toArray();
+		$surveyScores = array_column($surveyScores, 'average', 'capability_id');
+
+		$surveySubcapabilitiesScore = SurveySubcapabilityScore::selectRaw('subcapability_id, avg(score) as average')
+			->whereIn('survey_id', $surveyIds)->groupBy('subcapability_id')->get()->toArray();
+		$subcapabilitiesScores = array_column($surveySubcapabilitiesScore, 'average', 'subcapability_id');
+
+		$stakeholders = Stakeholder::all();
+		$indicatorStakeholdersAverages = [];
+		foreach ($stakeholders as $stakeholder) {
+			$stakeholderCompletedSurveys = Survey::whereStatus('completed')
+				->whereStakeholderId($stakeholder->id)
+				->get()
+				->pluck('id');
+
+			$indicatorAverages = SurveyAnswer::selectRaw('indicator_id, avg(score) as average')
+				->whereIn('survey_id', $stakeholderCompletedSurveys)->groupBy('indicator_id')->get()->toArray();
+			$indicatorAverages = array_column($indicatorAverages, 'average', 'indicator_id');
+
+			foreach ($indicatorAverages as $indicatorId => $average) {
+
+				$indicatorStakeholdersAverages[$indicatorId][$stakeholder->id] = round($average, 2);
+			}
+		}
+		logger($subcapabilitiesScores);
+
+		return view('pages.schools.report', [
+			'school' => $school,
+			'capabilities' => $capabilities,
+			'subcapabilitiesScores' => $subcapabilitiesScores,
+			'stakeholders' => $stakeholders,
+			'indicatorStakeholdersAverages' => $indicatorStakeholdersAverages,
+			'surveyScores' => $surveyScores
+		]);
+	}
 
     /**
      * Display the specified resource.
@@ -71,7 +139,12 @@ class SchoolController extends Controller
      */
     public function update(Request $request, School $school)
     {
-        //
+		$validated = $request->validate([
+			'name' => 'required'
+		]);
+		$school->update($validated);
+		toastr()->success('School updated successfully');
+		return redirect()->back();
     }
 
     /**
@@ -79,6 +152,8 @@ class SchoolController extends Controller
      */
     public function destroy(School $school)
     {
-        //
+		School::whereId($school->id)->delete();
+		toastr()->success('School deleted successfully');
+		return response()->noContent();
     }
 }

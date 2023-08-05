@@ -2,12 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\SchoolScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Survey extends Model
 {
     use HasFactory;
+	protected static function booted()
+	{
+		if (request()->get('school_id')) {
+			static::addGlobalScope(new SchoolScope(request()->get('school_id')));
+		}
+	}
 	public function school() {
 		return $this->belongsTo(School::class);
 	}
@@ -15,12 +22,9 @@ class Survey extends Model
 		return $this->belongsTo(Stakeholder::class);
 	}
 
-	public function capability() {
-		return $this->belongsTo(Capability::class);
-	}
-
-	public function subcapability() {
-		return $this->belongsTo(Subcapability::class);
+	public function answers()
+	{
+		return $this->hasMany(SurveyAnswer::class);
 	}
 
 	public function indicator() {
@@ -33,5 +37,68 @@ class Survey extends Model
 
 	public static function generateInvitationToken($email) {
 		return substr(md5(rand(0, 9) . $email . time()), 0, 32);
+	}
+
+	public function getNextSubcapability()
+	{
+		$subcapability = Subcapability::where([
+			'capability_id' => $this->capability_id
+		])->where('id', '>', $this->subcapability_id)->first();
+		$this->subcapability_id = $subcapability->id;
+		$this->indicator_id = 0;
+		$this->getNextIndicator();
+	}
+
+	public function currentCapability()
+	{
+		return Capability::where('id', '>', $this->indicator->subcapability->capability_id)->first();
+	}
+
+	public function currentSubcapability($capabilityId, $first = false)
+	{
+		$builder = Subcapability::where([
+			'capability_id' => $capabilityId
+		]);
+		if ($first)
+			$builder->where('id', '>', 0);
+		else
+			$builder->where('id', '>', $this->indicator->subcapability_id);
+		return $builder->first();
+	}
+
+	public function currentIndicator($subcapabilityId, $first = false)
+	{
+		$builder = Indicator::where([
+			'subcapability_id' => $subcapabilityId,
+		]);
+		if ($first)
+			$builder->where('id', '>', 0);
+		else
+			$builder->where('id', '>', $this->indicator_id);
+		return $builder->first();
+	}
+
+	public function getNextIndicator()
+	{
+		$indicator = $this->currentIndicator($this->indicator->subcapability_id);
+		if (!$indicator) {
+			$subcapability = $this->currentSubcapability($this->indicator->subcapability->capability_id);
+			if (!$subcapability) {
+				$capability = $this->currentCapability();
+				if (!$capability)
+				{
+					$schoolScore = new SurveyScore();
+					$schoolScore->generateScores($this);
+					$this->status = 'completed';
+					$this->completed_at = now();
+					$this->save();
+					return;
+				}
+				$subcapability = $this->currentSubcapability($capability->id, true);
+			}
+			$indicator = $this->currentIndicator($subcapability->id, true);
+		}
+		$this->indicator_id = $indicator->id;
+		$this->save();
 	}
 }

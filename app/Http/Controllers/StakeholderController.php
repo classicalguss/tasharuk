@@ -41,10 +41,10 @@ class StakeholderController extends Controller
      */
     public function store(Request $request)
     {
-		logger("should create here");
 		Stakeholder::create([
 			'name' => $request->post('name'),
 		]);
+		toastr()->success('Stakeholder added successfully!', 'Success');
 		return redirect()->back();
 	}
 

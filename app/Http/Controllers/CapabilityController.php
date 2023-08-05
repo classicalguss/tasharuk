@@ -48,15 +48,6 @@ class CapabilityController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create(Request $request)
-    {
-        //
-		return redirect()->back();
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreCapabilityRequest $request)

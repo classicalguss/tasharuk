@@ -15,7 +15,9 @@ function setUpdateModal() {
         var id = $(e.relatedTarget).data('id');
 
         //populate the textbox
-        $(e.currentTarget).find('input[name="name"]').val(name);
-        $(e.currentTarget).find('form').attr('action', $(e.currentTarget).find('form').attr('action')+`/${id}` )
+        if (name)
+            $(e.currentTarget).find('input[name="name"]').val(name);
+        if (id)
+            $(e.currentTarget).find('form').attr('action', $(e.currentTarget).find('form').attr('action')+`/${id}` )
     });
 }

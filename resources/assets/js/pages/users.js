@@ -4,7 +4,7 @@ $(function () {
     // Variable declaration for table
     const
         dt_user_table = $('.datatables-items'),
-        userView = baseUrl + 'resource/users/';
+        userView = baseUrl + 'users/';
 
     $.extend($.fn.dataTableExt.oStdClasses, {
         "sFilterInput": "form-control",
@@ -24,21 +24,20 @@ $(function () {
             responsive: true,
             fixedColumns: true,
             ajax: {
-                url: baseUrl + 'resource/users'
+                url: baseUrl + 'users'
             },
             columns: [
                 // columns according to JSON
                 {data: 'name'},
                 {data: 'school'},
                 {data: 'roles_all'},
-                {data: 'email_verified_at'}
+                {data: 'is_active'}
             ],
             columnDefs: [
                 {
                     // User full name
                     targets: 0,
                     render: function (data, type, full, meta) {
-                        console.log("hmmm");
                         // Creates full output for row
                         return '<div class="d-flex justify-content-start align-items-center">' +
                             '<div class="avatar-wrapper">' +
@@ -62,7 +61,9 @@ $(function () {
                     targets: 1,
                     orderable: false,
                     render: function (data, type, full, meta) {
-                        return full.school.name;
+                        if (full.school)
+                            return full.school.name;
+                        return "";
                     }
                 },
                 {
@@ -70,20 +71,22 @@ $(function () {
                     targets: 2,
                     orderable: false,
                     render: function (data, type, full, meta) {
-                        return full.roles_all[0].name
+                        if (full.roles_all && full.roles_all[0])
+                            return full.roles_all[0].name
+                        return "";
                     }
                 },
                 {
-                    // email verify
+                    // is active
                     targets: 3,
                     orderable: false,
                     className: 'text-center',
                     render: function (data, type, full, meta) {
-                        var $verified = full['email_verified_at'];
+                        var $isActive = full['is_active'];
                         return `${
-                            $verified
-                                ? '<i class="bx fs-4 bx-check-shield text-success"></i>'
-                                : '<i class="bx fs-4 bx-shield-x text-danger" ></i>'
+                            $isActive
+                                ? '<i class="bx fs-4 bx-check-circle text-success"></i>'
+                                : '<i class="bx fs-4 bx-x-circle text-danger" ></i>'
                         }`;
                     }
                 },

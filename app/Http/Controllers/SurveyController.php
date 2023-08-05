@@ -9,6 +9,7 @@ use App\Models\School;
 use App\Models\Stakeholder;
 use App\Models\Subcapability;
 use App\Models\Survey;
+use App\Models\SurveyAnswer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -77,37 +78,53 @@ class SurveyController extends Controller
 				'receiver_email' => $email['value'],
 				'stakeholder_id' => $request->post('stakeholder_id'),
 				'school_id' => $school->id,
-				'capability_id' => $firstCapability->id,
-				'subcapability_id' => $firstSubcapability->id,
 				'indicator_id' => $firstIndicator->id,
-				'status' => 'Not started',
+				'status' => 'not_started',
 				"created_at" => date('Y-m-d H:i:s'),
 				"updated_at" => date('Y-m-d H:i:s'),
 				'invitation_token' => $token
 			];
 			Mail::to($email['value'])->send(new SurveyMailer($school->name, $token));
 		}
-		$surveys = Survey::insert($data);
+		Survey::insert($data);
 		toastr()->success(count($data) . ' surveys were sent successfully');
 		return redirect()->back();
+	}
+
+	public function rate(Survey $survey, Request $request)
+	{
+		$surveyAnswer = new SurveyAnswer();
+		$surveyAnswer->survey_id = $survey->id;
+		$surveyAnswer->score = $request->post('rate');
+		$surveyAnswer->indicator_id = $survey->indicator_id;
+		$surveyAnswer->save();
+		$survey->getNextIndicator();
+		return redirect()->back();
+	}
+
+	public function complete()
+	{
+		return view('pages.surveys.done');
 	}
 
 	public function survey(Request $request) {
 		$survey = Survey::where([
 			'invitation_token' => $request->get('token')
 		])->first();
-		if ($request->get('rate')) {
-			$indicator = Indicator::where([
-				'subcapability_id' => $survey->subcapability_id,
-			])->where('id', '>', $survey->indicator_id)->first();
-			$survey->indicator_id = $indicator->id;
-			$survey->save();
-		}
+
+		if ($survey->status == 'completed')
+			return view('pages.surveys.done');
+
 		if ($request->get('begin')) {
-			$survey->status = 'Progress';
+			$survey->status = 'progress';
 			$survey->save();
 		}
-		$isFirst = $survey->status == 'Not started';
+
+		$indicatorsCount = Indicator::count();
+		$surveyAnswers = SurveyAnswer::whereSurveyId($survey->id)->count();
+		$progress = (($surveyAnswers + 1) / ($indicatorsCount + 1)) * 100;
+
+		$isFirst = $survey->status == 'not_started';
 		$ratings = [
 			'Highly Effective',
 			'Effective',
@@ -116,11 +133,12 @@ class SurveyController extends Controller
 			'Does not meet standard'
 		];
 		return view('pages.surveys.survey',[
+			'progress' => $progress,
 			'ratings' => $ratings,
-			'capability' => $survey->capability->name,
-			'subcapability' => $survey->subcapability->name,
-			'indicator' => $survey->indicator->text,
-			'nextIndicator' => $survey->indicator_id,
+			'survey' => $survey,
+			'capability' => $survey->indicator->subcapability->capability->name,
+			'subcapability' => $survey->indicator->subcapability->name,
+			'indicator' => $survey->indicator,
 			'isFirst' => $isFirst
 		]);
 	}

@@ -32,6 +32,7 @@ function prepareSurveysTable() {
                     }},
                 {data: 'status'},
                 {data: 'created_at'},
+                {data: 'completed_at'},
             ],
             ordering: false,
             order: [],

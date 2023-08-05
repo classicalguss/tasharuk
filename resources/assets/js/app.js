@@ -5,15 +5,16 @@ export { alpine };
 
 const colors = ['success', 'danger', 'secondary', 'warning', 'info', 'dark', 'primary'];
 function avatar(user) {
-    let $output = '';
+    let $output = '<a href="/users/'+user.id+'">';
     if (user['profile_photo_url']) {
-        $output = '<img src="'+user['profile_photo_url']+'" alt="" class="rounded-circle">';
+        $output += '<img src="'+user['profile_photo_url']+'" alt="" class="rounded-circle">';
     } else {
         let colorClass = colors[user['id'] % 7],
             $initials = user['name'].match(/\b\w/g) || [];
         $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
-        $output = '<span class="avatar-initial rounded-circle bg-label-' + colorClass + '">' + $initials + '</span>';
+        $output += '<span class="avatar-initial rounded-circle bg-label-' + colorClass + '">' + $initials + '</span>';
     }
+    $output += '</a>'
     return $output;
 }
 

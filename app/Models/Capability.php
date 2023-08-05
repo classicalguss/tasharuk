@@ -31,4 +31,9 @@ class Capability extends Model
 		'weight',
 		'is_visible'
 	];
+
+	public function subcapabilities()
+	{
+		return $this->hasMany(Subcapability::class);
+	}
 }

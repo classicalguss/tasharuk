@@ -38,4 +38,8 @@ class Subcapability extends Model
 	public function capability() {
 		return $this->belongsTo(Capability::class);
 	}
+
+	public function indicators() {
+		return $this->hasMany(Indicator::class);
+	}
 }

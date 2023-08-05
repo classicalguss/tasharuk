@@ -1,18 +1,29 @@
+@php use App\Models\School;use Spatie\Permission\Models\Role; @endphp
 @extends('layouts.layoutMaster')
 
 @section('title', 'User Management')
 
 @section('vendor-style')
+    <link rel="stylesheet" href="{{asset('assets/vendor/libs/bootstrap-select/bootstrap-select.css')}}" />
 @endsection
 
 @section('vendor-script')
+    <script src="{{asset('assets/vendor/libs/bootstrap-select/bootstrap-select.js')}}"></script>
 @endsection
 
 @section('content')
     @include("components.breadcrumbs", ["breadcrumbs" => [
-	    ['text' => 'Users', 'url' => route('users')],
+	    ['text' => 'Users', 'url' => route('users.index')],
         ['text' => $user->name, 'active' => true]
     ]])
+    @include('components.form-modal', [
+		'url' => route('users.update', ['user' => $user]),
+        'fields' => [
+            ['name' => 'school_id', 'type'=>'select', 'selected' => $user->school_id, 'options' => array_column(School::all()->toArray(), 'name', 'id')],
+            ['name' => 'role_id', 'type'=>'select', 'selected' => $user->roles[0]->id, 'options' => array_column(Role::all()->toArray(), 'name', 'id')],
+        ],
+        'action' => 'update'
+    ])
     <div class="row gy-4">
         <!-- User Sidebar -->
         <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
@@ -22,7 +33,7 @@
                     <div class="my-4 user-avatar-section">
                         <div class=" d-flex align-items-center flex-column">
                             <div class="avatar avatar-xxl my-4">
-                                <x-avatar :user="$user" class="rounded"/>
+                                <x-avatar :user="$user" class="rounded"></x-avatar>
                             </div>
 
                             <div class="user-info text-center">
@@ -64,9 +75,20 @@
                             </li>
                         </ul>
                         <div class="d-flex justify-content-center pt-3">
-                            <a href="javascript:;" class="btn btn-label-secondary me-3" data-bs-target="#editUser"
-                               data-bs-toggle="modal">Deactivate</a>
-                            <a href="javascript:;" class="btn btn-label-danger suspend-user">Delete</a>
+                            <x-button class="col-4 me-2" data-bs-toggle="modal" data-bs-target="#updateModal">Update
+                            </x-button>
+                            @if($user->is_active)
+                                <a href="{{route('users.toggle-active-status', ['user' => $user])}}"
+                                   class="btn btn-label-secondary col-4 me-2">Deactivate</a>
+                            @else
+                                <a href="{{route('users.toggle-active-status', ['user' => $user])}}"
+                                   class="btn btn-label-secondary col-4 me-2">Activate</a>
+                            @endif
+                            <form method="POST" action="{{ route('users.destroy', ['user' => $user])}}">
+                                @csrf
+                                @method('DELETE')
+                                <x-button-danger class="btn-danger">Delete</x-button-danger>
+                            </form>
                         </div>
                     </div>
                 </div>

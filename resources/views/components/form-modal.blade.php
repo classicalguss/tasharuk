@@ -23,6 +23,20 @@
                                            placeholder="Enter {{str_replace('_', ' ', ucfirst($field['name']))}}" required>
                                 </div>
                             </div>
+                    @elseif($field['type'] == 'select')
+                                <div class="row">
+                                    <div class="col mb-3">
+                                        <select name="{{$field['name']}}" id="{{$field['name']}}-form-id" class="selectpicker w-100" data-style="btn-default" required>
+                                            @foreach($field['options'] as $key => $value)
+                                                <option
+                                                        @if($field['selected'] == $key)
+                                                            selected="selected"
+                                                        @endif
+                                                        value="{{$key}}">{{$value}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
                     @elseif($field['type'] == "hidden")
                         <input type="hidden" name="{{$field['name']}}" value="{{$field['value']}}">
                     @endif
@@ -44,7 +58,6 @@
         @push('scripts')
             <script>
                 $(document).ready(function () {
-                    console.log("updating");
                     setUpdateModal();
                 })
             </script>

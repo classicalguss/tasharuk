@@ -4,7 +4,7 @@
     "creatorName" => "PIXINVENT",
     "creatorUrl" => "https://pixinvent.com",
     "templateName" => "Tasharuk",
-    "templateSuffix" => "Bootstrap Admin Template",
+    "templateSuffix" => "",
     "templateVersion" => "1.0.0",
     "templateFree" => false,
     "templateDescription" => "Start your development with a Dashboard for Bootstrap 5",

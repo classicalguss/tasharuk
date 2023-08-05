@@ -1,16 +1,13 @@
 'use strict';
 
-console.log("ok?")
-let cardColor, headingColor, labelColor, borderColor, legendColor;
+let headingColor, labelColor, borderColor, legendColor;
 
 if (isDarkStyle) {
-    cardColor = config.colors_dark.cardColor;
     headingColor = config.colors_dark.headingColor;
     labelColor = config.colors_dark.textMuted;
     legendColor = config.colors_dark.bodyColor;
     borderColor = config.colors_dark.borderColor;
 } else {
-    cardColor = config.colors.cardColor;
     headingColor = config.colors.headingColor;
     labelColor = config.colors.textMuted;
     legendColor = config.colors.bodyColor;
@@ -26,6 +23,7 @@ const chartColors = {
     donut: {
         series1: '#60beab',
         series2: '#677788',
+        series3: '#f79292'
     },
     area: {
         series1: '#29dac7',
@@ -33,80 +31,93 @@ const chartColors = {
         series3: '#a5f8cd'
     }
 };
-const donutChartEl = document.querySelector('#donutChart'),
-    donutChartConfig = {
+
+var options2 = {
+    chart: {
+        height: '250px',
+        type: "radialBar",
+    },
+    series: [67],
+    colors: ["#60beab"],
+    plotOptions: {
+        radialBar: {
+            hollow: {
+                margin: 15,
+                size: "60%"
+            },
+            startAngle: -135,
+            endAngle: 135,
+            track: {
+                background: '#333',
+                startAngle: -135,
+                endAngle: 135,
+            },
+            dataLabels: {
+                name: {
+                    show: false,
+                },
+                value: {
+                    fontSize: "30px",
+                    show: true
+                }
+            }
+        }
+    },
+    fill: {
+        type: "gradient",
+        gradient: {
+            shade: "dark",
+            type: "horizontal",
+            gradientToColors: ["#f79292"],
+            stops: [0, 100]
+        }
+    },
+};
+
+
+new ApexCharts(document.querySelector("#overall-score"), options2).render();
+function renderDonutChart(selector, values) {
+
+    let donutChartEl = document.querySelector('#'+selector);
+    let donutChart = new ApexCharts(donutChartEl, {
         chart: {
-            height: 350,
+            height: '250px',
             fontFamily: 'IBM Plex Sans',
             type: 'donut'
         },
-        labels: ['Completed', 'Incomplete'],
-        series: [75, 25],
+        labels: Object.keys(values),
+        series: Object.values(values),
         colors: [
             chartColors.donut.series1,
             chartColors.donut.series2,
+            chartColors.donut.series3,
         ],
         stroke: {
+            width: 4,
+            height: 0.5,
             show: false,
             curve: 'straight'
         },
-        dataLabels: {
-            enabled: true,
-            formatter: function (val, opt) {
-                return parseInt(val) + '%';
-            }
-        },
         legend: {
-            show: true,
             position: 'bottom',
-            labels: {
-                colors: legendColor,
-                useSeriesColors: false
-            }
         },
         plotOptions: {
             pie: {
                 donut: {
-                    labels: {
-                        show: true,
-                        name: {
-                            fontSize: '2rem',
-                            color: legendColor
-                        },
-                        value: {
-                            fontSize: '1.2rem',
-                            color: legendColor,
-                            fontFamily: 'IBM Plex Sans',
-                            formatter: function (val) {
-                                return parseInt(val) + '%';
-                            }
-                        },
-                        total: {
-                            show: true,
-                            fontSize: '1.5rem',
-                            color: headingColor,
-                            label: 'Surveys',
-                            formatter: function (w) {
-                                return '100';
-                            }
-                        }
-                    }
-                }
+                    size: '50%'
+                },
             }
-        },
-    };
-console.log("beofre checking");
-if (typeof donutChartEl !== undefined && donutChartEl !== null) {
-    console.log("coming here");
-    const donutChart = new ApexCharts(donutChartEl, donutChartConfig);
+        }
+    });
     donutChart.render();
 }
-// Horizontal Bar Chart
-// --------------------------------------------------------------------
-const horizontalBarChartEl = document.querySelector('#horizontalBarChart'),
-    horizontalBarChartConfig = {
+
+function renderHorizontalChart(select, values, height = '400px') {
+    let horizontalBarChartEl = document.querySelector('#'+select);
+    const horizontalBarChart = new ApexCharts(horizontalBarChartEl, {
         chart: {
-            height: 300,
+            height: height,
+            width: '95%',
             fontFamily: 'IBM Plex Sans',
             type: 'bar',
             toolbar: {
@@ -115,8 +126,8 @@ const horizontalBarChartEl = document.querySelector('#horizontalBarChart'),
         },
         plotOptions: {
             bar: {
+                barHeight: '50%',
                 horizontal: true,
-                barHeight: '30%',
                 startingShape: 'rounded',
                 borderRadius: 8
             }
@@ -129,41 +140,60 @@ const horizontalBarChartEl = document.querySelector('#horizontalBarChart'),
                 }
             },
         },
-        colors: config.colors.primary,
+        colors: [
+            function({ value, seriesIndex, w }) {
+                if (value > 75) {
+                    return '#006400'
+                } else if (value > 50) {
+                    return '#e8e51c'
+                } else {
+                    return '#c92c14';
+                }
+            }
+        ],
         dataLabels: {
             enabled: false
         },
         series: [
             {
-                data: [90, 80]
+                data: Object.values(values)
             }
         ],
         xaxis: {
-            categories: ['design', 'sports'],
+            categories: Object.keys(values),
             axisBorder: {
                 show: false
             },
-            axisTicks: {
-                show: false
-            },
             labels: {
                 style: {
                     colors: labelColor,
                     fontSize: '13px'
                 }
-            }
+            },
+            max: 100
         },
         yaxis: {
             labels: {
+                maxWidth: 250,
                 style: {
                     colors: labelColor,
-                    fontSize: '13px'
+                    fontSize: '13px',
                 }
             }
         }
-    };
-if (typeof horizontalBarChartEl !== undefined && horizontalBarChartEl !== null) {
-    console.log("should come to horizontal")
-    const horizontalBarChart = new ApexCharts(horizontalBarChartEl, horizontalBarChartConfig);
+    });
     horizontalBarChart.render();
+}
+
+function initSchoolSelect(el)
+{
+    el.on('change', function() {
+        console.log($(this).val());
+        if ($(this).val() == "0") {
+            window.location = window.location.href.split('?')[0];
+        } else {
+            window.location = '?school_id='+$(this).val();
+        }
+        return false;
+    })
 }

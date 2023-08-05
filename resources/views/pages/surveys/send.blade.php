@@ -53,7 +53,7 @@
     @push('scripts')
         <script>
             $(document).ready(function () {
-                // tagifyUsersList();
+                tagifyUsersList();
             })
         </script>
     @endpush

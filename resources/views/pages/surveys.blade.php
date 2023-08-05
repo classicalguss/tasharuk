@@ -26,6 +26,7 @@
                         <th>School</th>
                         <th>Status</th>
                         <th>Sent at</th>
+                        <th>Completed at</th>
                     </tr>
                 </thead>
             </table>
@@ -35,3 +36,11 @@
         <div class="slider-dynamic"></div>
     </div>
 @endsection
+
+@once
+    @push('scripts')
+        <script>
+            prepareSurveysTable();
+        </script>
+    @endpush
+@endonce

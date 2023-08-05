@@ -15,14 +15,14 @@
       "icon": "menu-icon tf-icons bx bx-user",
       "slug": "users",
       "url": "/users",
-      "otherSlugs": []
+      "otherSlugs": ["users.index", "users.invite", "users.view"]
     },
     {
       "name": "Schools",
       "icon": "menu-icon tf-icons bx bxs-school",
       "slug": "schools",
       "url": "/schools",
-      "otherSlugs": []
+      "otherSlugs": ["schools.index", "schools.report"]
     },
     {
       "menuHeader": "Audit content"

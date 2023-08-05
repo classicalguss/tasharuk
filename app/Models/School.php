@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\SchoolScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Models\Role;
@@ -39,6 +40,8 @@ use Spatie\Permission\Models\Role;
 class School extends Model
 {
     use HasFactory;
+
+	protected $fillable = ['name'];
 
 	public function owner() {
 		return $this->hasOne(User::class, 'id', 'owner_id');

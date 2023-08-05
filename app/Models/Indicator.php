@@ -38,4 +38,9 @@ class Indicator extends Model
 		'subcapability_id',
 		'is_visible'
 	];
+
+	public function subcapability()
+	{
+		return $this->belongsTo(Subcapability::class);
+	}
 }

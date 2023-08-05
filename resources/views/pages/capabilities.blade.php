@@ -1,3 +1,4 @@
+@php use App\Models\Stakeholder; @endphp
 @extends('layouts.layoutMaster')
 
 @section('title', 'User Management')
@@ -31,9 +32,11 @@
             'title' => 'Add Capability',
             'url' => url('resource/capabilities'),
             'fields' => [
-                ['name' => 'name', 'type'=>'text']
+                ['name' => 'name', 'type'=>'text'],
             ]
         ])
+    @else
+        <h4>Overriding capabilities for {{Stakeholder::find(request()->get('stakeholder_id'))->name}}</h4>
     @endif
     <x-secondary-button onclick="updateWeights('capabilities')" class="mb-3 d-none" id="updateWeightsButton">Update
         weights

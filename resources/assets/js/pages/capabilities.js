@@ -314,7 +314,6 @@ function fetchCapabilities() {
                     width: "10%",
                     title: 'Actions',
                     render: function (data, type, full, meta) {
-                        console.log(full);
                         return renderActions(data, 'capability', full);
                     }
                 }
