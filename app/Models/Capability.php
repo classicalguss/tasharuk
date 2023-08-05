@@ -32,6 +32,16 @@ class Capability extends Model
 		'is_visible'
 	];
 
+	protected static function booted(): void
+	{
+		static::deleted(function (Capability $capability) {
+			$subcapabilityIds = Subcapability::where('capability_id')->get()->pluck('id');
+			Indicator::whereIn('subcapability_id', $subcapabilityIds)->delete();
+			Subcapability::whereCapabilityId($capability->id)->delete();
+			SurveyScore::whereCapabilityId($capability->id)->delete();
+		});
+	}
+
 	public function subcapabilities()
 	{
 		return $this->hasMany(Subcapability::class);

@@ -27,13 +27,15 @@ class IndicatorController extends Controller
 	public function index(Request $request, Subcapability $subcapability)
 	{
 		$stakeholderId = $request->get('stakeholder_id');
+		$schoolId = $request->get('school_id');
 		$indicators = Indicator::whereSubcapabilityId($subcapability->id)->get();
 		foreach ($indicators as $indicator) {
 
 			$overrides = OverrideCapability::where([
 				'updated_model' => 'indicator',
 				'foreign_id' => $indicator->id,
-				'stakeholder_id' => $stakeholderId
+				'stakeholder_id' => $stakeholderId,
+				'school_id' => $schoolId
 			])->get();
 			foreach ($overrides as $override) {
 				$updatedColumn = $override->updated_column;
@@ -51,15 +53,17 @@ class IndicatorController extends Controller
 	public function update(Subcapability $subcapability, Indicator $indicator, Request $request)
 	{
 		$stakeholderId = $request->post('stakeholder_id');
+		$schoolId = $request->post('school_id');
 		$safe = ['text', 'highly_effective', 'effective', 'satisfactory', 'needs_improvement', 'does_not_meet_standard', 'is_visible'];
 		$validated = $request->only($safe);
-		if ($stakeholderId) {
+		if ($stakeholderId || $schoolId) {
 			foreach ($validated as $key => $value) {
 				OverrideCapability::updateOrCreate([
 					'updated_model' => 'indicator',
 					'updated_column' => $key,
 					'foreign_id' => $indicator->id,
-					'stakeholder_id' => $stakeholderId
+					'stakeholder_id' => $stakeholderId,
+					'school_id' => $schoolId
 				], [
 					'new_value' => $value
 				]);

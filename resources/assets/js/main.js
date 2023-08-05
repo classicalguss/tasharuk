@@ -14,11 +14,6 @@ if (document.getElementById('layout-menu')) {
     isHorizontalLayout = document.getElementById('layout-menu').classList.contains('menu-horizontal');
 }
 
-console.log("hmmm")
-function switchLanguage(lang) {
-    console.log(lang);
-}
-
 // Init BS Tooltip
 function toolTipTrigger() {
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -167,7 +162,6 @@ function toolTipTrigger() {
             selectedFlag = selectedDropdownItem.childNodes[1].className,
             startsWith = 'fs-',
             classes = selectedFlag.split(' ').filter(function (v) {
-                console.log(v);
                 return v.lastIndexOf(startsWith, 0) !== 0;
             });
 

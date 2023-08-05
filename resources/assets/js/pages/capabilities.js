@@ -55,7 +55,7 @@ function fetchIndicators(subcapabilityId) {
             searching: false,
             ordering: false,
             ajax: {
-                url: baseUrl + 'resource/subcapabilities/'+subcapabilityId+'/indicators?stakeholder_id='+stakeholderId
+                url: baseUrl + 'resource/subcapabilities/'+subcapabilityId+'/indicators?stakeholder_id='+stakeholderId+'&school_id='+schoolId
             },
             columns: [
                 // columns according to JSON
@@ -143,6 +143,8 @@ function saveIndicator(element, subcapabilityId) {
     data[currentEditableDiv.data('column')] = currentValue;
     if (stakeholderId)
         data['stakeholder_id'] = stakeholderId;
+    if (schoolId)
+        data['school_id'] = schoolId;
 
     axios({
         method: 'put',
@@ -170,8 +172,8 @@ function fetchSubcapabilities(capabilityId) {
 
     const dt_capability_table = $('.datatables-items');
     let subcapabilityView = baseUrl + 'subcapabilities/{subcapability}/indicators'
-    if (stakeholderId)
-        subcapabilityView += '?stakeholder_id='+stakeholderId;
+    if (stakeholderId || schoolId)
+        subcapabilityView += '?stakeholder_id='+stakeholderId+'&school_id='+schoolId;
     const indexUrl = baseUrl + "resource/capabilities/{capability}/subcapabilities".replace("{capability}", capabilityId);
 
     if (dt_capability_table.length) {
@@ -187,7 +189,7 @@ function fetchSubcapabilities(capabilityId) {
             fixedColumns: true,
             searching: false,
             ajax: {
-                url: indexUrl+'?stakeholder_id='+stakeholderId,
+                url: indexUrl+'?stakeholder_id='+stakeholderId+'&school_id='+schoolId,
             },
             columns: [
                 // columns according to JSON
@@ -247,7 +249,7 @@ function renderActions(data, type, full) {
         `<button ${dataCapabilityId} data-type="${type}" data-id=${full['id']} data-visible=${full['is_visible']} onclick="toggleVisibility(this)" title="Toggle visibility" class="btn btn-sm btn-icon">` +
         `<i class="bx ${visibilityIcon}"></i></button>`
     );
-    if (!stakeholderId) {
+    if (!stakeholderId && !schoolId) {
        actions += `<button ${dataCapabilityId} data-type="${type}" title="Delete" class="btn btn-sm btn-icon delete-record" onclick="deleteRecord(this)" data-id="${full['id']}"><i class="bx bx-trash"></i></button>`
     }
     actions += (
@@ -260,8 +262,10 @@ function fetchCapabilities() {
 
     const dt_capability_table = $('.datatables-items');
     let capabilityView = baseUrl + 'capabilities/%/subcapabilities';
-    if (stakeholderId)
-        capabilityView += '?stakeholder_id='+stakeholderId;
+    if (stakeholderId || schoolId) {
+
+        capabilityView += '?stakeholder_id='+stakeholderId+'&school_id='+schoolId;
+    }
 
     if (dt_capability_table.length) {
         dt_capability_table.DataTable({
@@ -277,7 +281,7 @@ function fetchCapabilities() {
             searching: false,
             ordering: false,
             ajax: {
-                url: baseUrl + 'resource/capabilities?stakeholder_id='+stakeholderId,
+                url: baseUrl + 'resource/capabilities?stakeholder_id='+stakeholderId+'&school_id='+schoolId,
             },
             columns: [
                 // columns according to JSON
@@ -354,7 +358,8 @@ function updateWeights(modelType) {
         url: url,
         data: {
             weights: payloadArray,
-            stakeholder_id: stakeholderId
+            stakeholder_id: stakeholderId,
+            school_id: schoolId
         }
     }).then(function() {
         let weightsButton = $('#updateWeightsButton');
@@ -392,6 +397,7 @@ function toggleVisibility(el) {
         url: url,
         data: {
             is_visible:  Boolean(parseInt(el.dataset.visible)),
+            school_id: schoolId,
             stakeholder_id: stakeholderId
         }
     })

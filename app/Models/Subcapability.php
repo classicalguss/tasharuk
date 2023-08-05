@@ -42,4 +42,11 @@ class Subcapability extends Model
 	public function indicators() {
 		return $this->hasMany(Indicator::class);
 	}
+
+	protected static function booted(): void
+	{
+		static::deleted(function (Subcapability $subcapability) {
+			Indicator::whereSubcapabilityId($subcapability->id)->delete();
+		});
+	}
 }

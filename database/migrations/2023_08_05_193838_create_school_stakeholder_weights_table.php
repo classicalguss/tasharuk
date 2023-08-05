@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\School;
+use App\Models\Stakeholder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,10 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('schools', function (Blueprint $table) {
+        Schema::create('school_stakeholder_weights', function (Blueprint $table) {
             $table->id();
-			$table->string('name');
-			$table->string('name_ar')->nullable();
+			$table->foreignIdFor(School::class);
+			$table->foreignIdFor(Stakeholder::class);
+			$table->float('weight');
             $table->timestamps();
         });
     }
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('schools');
+        Schema::dropIfExists('school_stakeholder_weights');
     }
 };

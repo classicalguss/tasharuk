@@ -62,6 +62,5 @@ $(".tagify").bind('paste', function(e) {
     setTimeout(function() {
         // gets the copied text after a specified time (100 milliseconds)
         var text = elem.val();
-        console.log("The text is");
     }, 100);
 });

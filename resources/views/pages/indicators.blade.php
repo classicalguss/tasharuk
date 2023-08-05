@@ -93,7 +93,8 @@
     @push('scripts')
         <script>
             $(document).ready(function() {
-                stakeholderId = {{request()->get('stakeholder_id', 0)}}
+                stakeholderId = parseInt({{request()->get('stakeholder_id', 0)}})
+                schoolId = parseInt({{request()->get('school_id', 0)}})
                 fetchIndicators({{$subcapability->id}});
             })
         </script>

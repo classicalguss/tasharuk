@@ -13,6 +13,7 @@ class OverrideCapability extends Model
 		'updated_column',
 		'foreign_id',
 		'stakeholder_id',
+		'school_id',
 		'new_value'
 	];
 }

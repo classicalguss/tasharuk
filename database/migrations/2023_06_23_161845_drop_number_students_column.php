@@ -13,7 +13,6 @@ return new class extends Migration
     {
         //
 		Schema::table('schools', function (Blueprint $table) {
-			$table->dropColumn('students_number_range');
 		});
     }
 

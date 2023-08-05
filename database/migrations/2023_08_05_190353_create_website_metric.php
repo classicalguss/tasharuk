@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('schools', function (Blueprint $table) {
-            //
+        Schema::create('website_metrics', function (Blueprint $table) {
+			$table->unsignedInteger('num_of_visitors')->default(0);
         });
     }
 
@@ -21,8 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('schools', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('website_metrics');
     }
 };

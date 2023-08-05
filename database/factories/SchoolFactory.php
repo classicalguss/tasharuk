@@ -24,9 +24,6 @@ class SchoolFactory extends Factory
 		return [
 			'name' => $name,
 			'name_ar' => '',
-			'logo' => '',
-			'students_number_range' => '5000',
-			'country' => $faker->countryCode,
 		];
     }
 }

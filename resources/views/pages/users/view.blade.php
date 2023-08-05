@@ -17,6 +17,7 @@
         ['text' => $user->name, 'active' => true]
     ]])
     @include('components.form-modal', [
+	    'title' => 'Update User',
 		'url' => route('users.update', ['user' => $user]),
         'fields' => [
             ['name' => 'school_id', 'type'=>'select', 'selected' => $user->school_id, 'options' => array_column(School::all()->toArray(), 'name', 'id')],
@@ -95,37 +96,37 @@
             </div>
         </div>
         <!-- User Content -->
-        <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
-            <div class="card mb-4">
-                <h5 class="card-header">User Activity Timeline</h5>
-                <div class="card-body">
-                    <ul class="timeline">
-                        <li class="timeline-item timeline-item-transparent">
-                            <span class="timeline-point timeline-point-primary"></span>
-                            <div class="timeline-event">
-                                <div class="timeline-header mb-1">
-                                    <h6 class="mb-0">Content Modification</h6>
-                                    <small class="text-muted">12 min ago</small>
-                                </div>
-                                <p class="mb-2">Excel import</p>
-                            </div>
-                        </li>
-                        <li class="timeline-item timeline-item-transparent">
-                            <span class="timeline-point timeline-point-primary"></span>
-                            <div class="timeline-event">
-                                <div class="timeline-header mb-1">
-                                    <h6 class="mb-0">Surveys Modification</h6>
-                                    <small class="text-muted">1 hour ago</small>
-                                </div>
-                                <p class="mb-2">10 surveys sent</p>
-                            </div>
-                        </li>
-                        <li class="timeline-end-indicator">
-                            <i class="bx bx-check-circle"></i>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+{{--        <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">--}}
+{{--            <div class="card mb-4">--}}
+{{--                <h5 class="card-header">User Activity Timeline</h5>--}}
+{{--                <div class="card-body">--}}
+{{--                    <ul class="timeline">--}}
+{{--                        <li class="timeline-item timeline-item-transparent">--}}
+{{--                            <span class="timeline-point timeline-point-primary"></span>--}}
+{{--                            <div class="timeline-event">--}}
+{{--                                <div class="timeline-header mb-1">--}}
+{{--                                    <h6 class="mb-0">Content Modification</h6>--}}
+{{--                                    <small class="text-muted">12 min ago</small>--}}
+{{--                                </div>--}}
+{{--                                <p class="mb-2">Excel import</p>--}}
+{{--                            </div>--}}
+{{--                        </li>--}}
+{{--                        <li class="timeline-item timeline-item-transparent">--}}
+{{--                            <span class="timeline-point timeline-point-primary"></span>--}}
+{{--                            <div class="timeline-event">--}}
+{{--                                <div class="timeline-header mb-1">--}}
+{{--                                    <h6 class="mb-0">Surveys Modification</h6>--}}
+{{--                                    <small class="text-muted">1 hour ago</small>--}}
+{{--                                </div>--}}
+{{--                                <p class="mb-2">10 surveys sent</p>--}}
+{{--                            </div>--}}
+{{--                        </li>--}}
+{{--                        <li class="timeline-end-indicator">--}}
+{{--                            <i class="bx bx-check-circle"></i>--}}
+{{--                        </li>--}}
+{{--                    </ul>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        </div>--}}
+{{--    </div>--}}
 @endsection

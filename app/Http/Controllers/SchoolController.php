@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Capability;
 use App\Models\Indicator;
 use App\Models\School;
+use App\Models\SchoolStakeholderWeight;
 use App\Models\Stakeholder;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
@@ -156,4 +157,28 @@ class SchoolController extends Controller
 		toastr()->success('School deleted successfully');
 		return response()->noContent();
     }
+
+	public function storeStakeholderWeights(School $school, Request $request) {
+
+		return response()->noContent();
+	}
+
+	public function updateStakeholderWeights(School $school, Request $request) {
+		$stakeholderWeights = SchoolStakeholderWeight::whereSchoolId($school->id);
+		$stakeholders = Stakeholder::all()->toArray();
+		foreach ($stakeholders as &$stakeholder) {
+			$stakeholder['weight'] = intval(100/count($stakeholders));
+		}
+
+		if ($request->expectsJson()) {
+			return [
+				'data' => $stakeholders
+			];
+		}
+
+		return view('pages.schools.updateStakeholderWeights', [
+			'stakeholders' => $stakeholders
+		]);
+
+	}
 }

@@ -11,7 +11,6 @@ class Menu {
     this._showDropdownOnHover = Boolean(config.showDropdownOnHover)
     this._closeChildren = Boolean(config.closeChildren)
     this._rtl = document.documentElement.getAttribute('dir') === 'rtl' || document.body.getAttribute('dir') === 'rtl'
-    console.log("what do i have here"+this._rtl);
 
     this._onOpen = config.onOpen || (() => {})
     this._onOpened = config.onOpened || (() => {})

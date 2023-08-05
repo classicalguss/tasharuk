@@ -111,6 +111,8 @@ function renderActions(school) {
         `<button title="Edit" class="btn btn-sm btn-icon edit-record" data-id="${school.id}" data-bs-toggle="modal" data-bs-target="#updateModal" data-name="${school.name}"><i class="bx bx-edit"></i></button>` +
         `<button data-id="${school.id}" title="Delete" class="btn btn-sm btn-icon delete-record" onclick="deleteRecord(this)"><i class="bx bx-trash"></i></button>` +
         `<a href="schools/${school.id}/report" title="Report" class="btn btn-sm btn-icon generate-report"><i class="bx bxs-report"></i></ah>` +
+        `<a href="/capabilities?school_id=${school.id}" title="Override Capabilities" class="btn btn-sm btn-icon delete-record"><i class="bx bx-color"></i></a>` +
+        `<a href="schools/${school.id}/update-stakeholder-weights?school_id=${school.id}" title="Override Stakeholder Weights" class="btn btn-sm btn-icon delete-record"><i class="bx bxs-group"></i></a>` +
         '</div>'
     );
 }

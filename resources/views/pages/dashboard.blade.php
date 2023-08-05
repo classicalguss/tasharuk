@@ -1,6 +1,6 @@
 @php
     use App\Models\Survey;$configData = Helper::appClasses();
-	use Illuminate\Support\Js;
+	use App\Models\WebsiteMetrics;use Illuminate\Support\Js;
 @endphp
 
 @extends('layouts.layoutMaster')
@@ -22,6 +22,7 @@
     .apexcharts-svg {
         overflow: visible;
     }
+
     .apexcharts-canvas {
         padding-left: 16px;
     }
@@ -75,7 +76,7 @@
                                             class="bx bx-show fs-4"></i></span>
                             </div>
                             <span class="d-block text-nowrap">Visits</span>
-                            <h2 class="mb-0">40</h2>
+                            <h2 class="mb-0">{{WebsiteMetrics::first()->num_of_visitors}}</h2>
                         </div>
                     </div>
                 </div>

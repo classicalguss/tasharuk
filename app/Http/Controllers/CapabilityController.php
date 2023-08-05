@@ -27,12 +27,14 @@ class CapabilityController extends Controller
     {
 		$capabilities = Capability::all();
 		$stakeholderId = $request->get('stakeholder_id');
+		$schoolId = $request->get('school_id');
 		foreach ($capabilities as $capability) {
 
 			$overrides = OverrideCapability::where([
 				'updated_model' => 'capability',
 				'foreign_id' => $capability->id,
-				'stakeholder_id' => $stakeholderId
+				'stakeholder_id' => $stakeholderId,
+				'school_id' => $schoolId
 			])->get();
 			foreach ($overrides as $override) {
 				$updatedColumn = $override->updated_column;
@@ -82,13 +84,15 @@ class CapabilityController extends Controller
     public function update(UpdateCapabilityRequest $request, Capability $capability)
     {
 		$stakeholderId = $request->post('stakeholder_id');
-		if ($stakeholderId)
+		$schoolId = $request->post('school_id');
+		if ($schoolId || $stakeholderId)
 			foreach ($request->validated() as $key => $value) {
 				OverrideCapability::updateOrCreate([
 					'updated_model' => 'capability',
 					'updated_column' => $key,
 					'foreign_id' => $capability->id,
-					'stakeholder_id' => $stakeholderId
+					'stakeholder_id' => $stakeholderId,
+					'school_id' => $schoolId
 				],[
 					'new_value' => $value
 				]);
@@ -105,13 +109,15 @@ class CapabilityController extends Controller
 	public function updateWeights(Request $request) {
 		$weights = $request->post('weights');
 		$stakeholderId = $request->post('stakeholder_id');
+		$schoolId = $request->post('school_id');
 		foreach ($weights as $key => $value) {
-			if ($stakeholderId) {
+			if ($schoolId || $stakeholderId) {
 				OverrideCapability::updateOrCreate([
 					'updated_model' => 'capability',
 					'updated_column' => 'weight',
 					'foreign_id' => $key,
-					'stakeholder_id' => $stakeholderId
+					'stakeholder_id' => $stakeholderId,
+					'school_id' => $schoolId
 				],[
 					'new_value' => $value
 				]);
@@ -127,7 +133,7 @@ class CapabilityController extends Controller
      */
     public function destroy(Capability $capability)
     {
-		Capability::whereId($capability->id)->delete();
+		$capability->delete();
 		return response()->noContent();
     }
 }

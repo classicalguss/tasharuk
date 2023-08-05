@@ -15,15 +15,6 @@ use Str;
 
 class DashboardController extends Controller
 {
-	public function devMergedCapabilitiesValues() {
-		return [
-			'capability_3' => 45,
-			'capability_4' => 70,
-			'capability_5' => 40,
-			'capability_6' => 90,
-			'capability_7' => 60,
-		];
-	}
     /**
      * Handle the incoming request.
      */
@@ -73,7 +64,6 @@ class DashboardController extends Controller
 		foreach ($capabilityScores as $key => $scores) {
 			$capabilityAverages[$key] = round(array_sum($scores) / count($scores));
 		}
-		$capabilityAverages = array_merge($capabilityAverages, $this->devMergedCapabilitiesValues());
 
 		//Stakeholders Averages
 		$stakeholdersAverages = [];
@@ -86,10 +76,7 @@ class DashboardController extends Controller
 			foreach ($capabilitiesScores as $capability => $scores) {
 				$stakeholdersAverages[$stakeholder][$capability] = round(array_sum($scores) / count($scores));
 			}
-			$stakeholdersAverages[$stakeholder] = array_merge($stakeholdersAverages[$stakeholder], $this->devMergedCapabilitiesValues());
 		}
-		$stakeholdersAverages['parents'] = $stakeholdersAverages['teachers'];
-		$stakeholdersAverages['management'] = $stakeholdersAverages['students'];
 
 		return view('pages.dashboard', [
 			'schools' => School::all(),

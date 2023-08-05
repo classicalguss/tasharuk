@@ -1,4 +1,4 @@
-@php use App\Models\Stakeholder; @endphp
+@php use App\Models\School;use App\Models\Stakeholder; @endphp
 @extends('layouts.layoutMaster')
 
 @section('title', 'User Management')
@@ -19,7 +19,7 @@
 @endsection
 
 @section('content')
-    @if(!request()->get('stakeholder_id'))
+    @if(!request()->get('stakeholder_id') && !request()->get('school_id'))
         <div class="row mb-4">
             <div class="col-12">
                 <livewire:import-capabilities/>
@@ -36,7 +36,14 @@
             ]
         ])
     @else
-        <h4>Overriding capabilities for {{Stakeholder::find(request()->get('stakeholder_id'))->name}}</h4>
+        <h4>Overriding capabilities for
+            @if(request()->get('stakeholder_id'))
+                Stakeholder {{Stakeholder::find(request()->get('stakeholder_id'))->name}}
+            @endif
+            @if(request()->get('school_id'))
+                School {{School::find(request()->get('school_id'))->name}}
+            @endif
+        </h4>
     @endif
     <x-secondary-button onclick="updateWeights('capabilities')" class="mb-3 d-none" id="updateWeightsButton">Update
         weights
@@ -79,6 +86,7 @@
         <script>
             $(document).ready(function () {
                 stakeholderId = parseInt({{request()->get('stakeholder_id', 0)}})
+                schoolId = parseInt({{request()->get('school_id', 0)}})
                 fetchCapabilities();
             })
         </script>

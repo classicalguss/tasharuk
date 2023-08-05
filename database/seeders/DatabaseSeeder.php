@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\School;
 use App\Models\User;
+use App\Models\WebsiteMetrics;
 use Database\Factories\SchoolFactory;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Seeder;
@@ -52,9 +53,6 @@ class DatabaseSeeder extends Seeder
 		]);
 		$adminSchool = School::create([
 			'name' => 'Tasharuk',
-			'country' => 'JO',
-			'students_number_range' => '10000',
-			'logo' => '',
 			'owner_id' => $superAdminUser->id
 		]);
 		$superAdminRole = Role::create(['name' => 'Super Admin']);
@@ -96,6 +94,10 @@ class DatabaseSeeder extends Seeder
 		foreach ($normalUsers as $admin) {
 			$admin->assignRole($studentRole);
 		}
+
+		$websiteMetrics = new WebsiteMetrics();
+		$websiteMetrics->num_of_visitors = 0;
+		$websiteMetrics->save();
 
 		DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
     }

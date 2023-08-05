@@ -188,7 +188,6 @@ function renderHorizontalChart(select, values, height = '400px') {
 function initSchoolSelect(el)
 {
     el.on('change', function() {
-        console.log($(this).val());
         if ($(this).val() == "0") {
             window.location = window.location.href.split('?')[0];
         } else {

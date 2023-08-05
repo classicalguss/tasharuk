@@ -11,6 +11,7 @@ use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\UserController;
 use App\Models\Subcapability;
 use App\Models\Survey;
+use App\Models\WebsiteMetrics;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -36,6 +37,9 @@ Route::view('/surveys/close', 'pages.surveys.close')->name('survey.close');
 Route::get('/survey', [SurveyController::class, 'survey'])->name('survey');
 Route::post('/surveys/{survey}/rate', [SurveyController::class, 'rate'])->name('surveys.rate');
 Route::get('/landing-page', function() {
+	$webMetrics = WebsiteMetrics::first();
+	$webMetrics->num_of_visitors++;
+	$webMetrics->save();
 	return view('pages.landing-page');
 })->name('landing');
 
@@ -70,6 +74,8 @@ Route::middleware([
 	Route::resource('users', UserController::class);
 
 	Route::get('/schools/{school}/report', [SchoolController::class, 'generateReport'])->name('schools.report');
+	Route::get('/schools/{school}/update-stakeholder-weights', [SchoolController::class, 'updateStakeholderWeights'])->name('schools.update-stakeholder-weights');
+	Route::post('/schools/{school}/store-stakeholder-weights', [SchoolController::class, 'storeStakeholderWeights'])->name('schools.store-stakeholder-weights');
 	Route::resource('schools', SchoolController::class);
 
 	Route::get('/', DashboardController::class)->name('dashboard');
