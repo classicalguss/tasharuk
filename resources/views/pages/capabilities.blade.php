@@ -36,14 +36,7 @@
             ]
         ])
     @else
-        <h4>Overriding capabilities for
-            @if(request()->get('stakeholder_id'))
-                Stakeholder {{Stakeholder::find(request()->get('stakeholder_id'))->name}}
-            @endif
-            @if(request()->get('school_id'))
-                School {{School::find(request()->get('school_id'))->name}}
-            @endif
-        </h4>
+        <h4>Overriding capabilities</h4>
     @endif
     <x-secondary-button onclick="updateWeights('capabilities')" class="mb-3 d-none" id="updateWeightsButton">Update
         weights
@@ -58,6 +51,32 @@
         ],
         'action' => 'update'
     ])
+    <div class="row mt-2">
+        <div class="col-lg-4">
+            <select id="schoolSelect" class="form-select form-select-sm">
+                <option value="0">-- No school selected --</option>
+                @foreach($schools as $school)
+                    <option
+                            @if ($school->id == request()->get('school_id'))
+                                selected="selected"
+                            @endif
+                            value="{{$school->id}}">{{$school->name}}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-lg-4">
+            <select id="stakeholderSelect" class="form-select form-select-sm">
+                <option value="0">-- No stakeholder selected --</option>
+                @foreach($stakeholders as $stakeholder)
+                    <option
+                            @if ($stakeholder->id == request()->get('stakeholder_id'))
+                                selected="selected"
+                            @endif
+                            value="{{$stakeholder->id}}">{{$stakeholder->name}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
     <br/>
     <div class="row">
         <div class="col-12">
@@ -89,6 +108,8 @@
                 schoolId = parseInt({{request()->get('school_id', 0)}})
                 fetchCapabilities();
             })
+            initSchoolSelect($('#schoolSelect'));
+            initStakeholdersSelect($('#stakeholderSelect'));
         </script>
     @endpush
 @endonce

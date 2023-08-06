@@ -21,3 +21,28 @@ function setUpdateModal() {
             $(e.currentTarget).find('form').attr('action', $(e.currentTarget).find('form').attr('action')+`/${id}` )
     });
 }
+
+function initSchoolSelect(el)
+{
+    el.on('change', function() {
+        var url = new URL(window.location);
+        url.searchParams.delete('school_id');
+        if ($(this).val() !== "0") {
+            url.searchParams.append('school_id', $(this).val());
+        }
+        window.location = url;
+        return false;
+    })
+}
+function initStakeholdersSelect(el)
+{
+    el.on('change', function() {
+        var url = new URL(window.location);
+        url.searchParams.delete('stakeholder_id');
+        if ($(this).val() != "0") {
+            url.searchParams.append('stakeholder_id', $(this).val());
+        }
+        window.location = url;
+        return false;
+    })
+}

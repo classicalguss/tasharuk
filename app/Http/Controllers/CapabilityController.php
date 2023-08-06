@@ -7,13 +7,18 @@ use App\Http\Requests\UpdateCapabilityRequest;
 use App\Models\Capability;
 use App\Models\CapabilityImport;
 use App\Models\OverrideCapability;
+use App\Models\School;
+use App\Models\Stakeholder;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 class CapabilityController extends Controller
 {
 	public function CapabilityManagement() {
-		return view('pages.capabilities');
+		return view('pages.capabilities', [
+			'stakeholders' => Stakeholder::all(),
+			'schools' => School::all()
+		]);
 	}
 
 	public function import(Request $request) {
@@ -36,6 +41,23 @@ class CapabilityController extends Controller
 				'stakeholder_id' => $stakeholderId,
 				'school_id' => $schoolId
 			])->get();
+
+			if (count($overrides) == 0)
+				$overrides = OverrideCapability::where([
+					'updated_model' => 'capability',
+					'foreign_id' => $capability->id,
+					'stakeholder_id' => 0,
+					'school_id' => $schoolId
+				])->get();
+
+			if (count($overrides) == 0)
+				$overrides = OverrideCapability::where([
+					'updated_model' => 'capability',
+					'foreign_id' => $capability->id,
+					'stakeholder_id' => $stakeholderId,
+					'school_id' => 0
+				])->get();
+
 			foreach ($overrides as $override) {
 				$updatedColumn = $override->updated_column;
 				$newValue = $override->new_value;

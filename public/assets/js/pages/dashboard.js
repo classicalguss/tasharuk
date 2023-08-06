@@ -187,14 +187,3 @@ function renderHorizontalChart(select, values, height = '400px') {
     horizontalBarChart.render();
 }
 
-function initSchoolSelect(el)
-{
-    el.on('change', function() {
-        if ($(this).val() == "0") {
-            window.location = window.location.href.split('?')[0];
-        } else {
-            window.location = '?school_id='+$(this).val();
-        }
-        return false;
-    })
-}
