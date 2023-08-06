@@ -15,7 +15,10 @@ function fetchWeights (schoolId) {
             searching: false,
             ordering: false,
             ajax: {
-                url: baseUrl + 'schools/'+schoolId+'/update-stakeholder-weights'
+                url: baseUrl + 'schools/'+schoolId+'/update-stakeholder-weights',
+                data: {
+                    school_id: schoolId
+                }
             },
             columns: [
                 // columns according to JSON

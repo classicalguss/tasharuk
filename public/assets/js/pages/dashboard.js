@@ -32,50 +32,52 @@ const chartColors = {
     }
 };
 
-var options2 = {
-    chart: {
-        height: '250px',
-        type: "radialBar",
-    },
-    series: [67],
-    colors: ["#60beab"],
-    plotOptions: {
-        radialBar: {
-            hollow: {
-                margin: 15,
-                size: "60%"
-            },
-            startAngle: -135,
-            endAngle: 135,
-            track: {
-                background: '#333',
+function renderRadial(selector, value) {
+    var options2 = {
+        chart: {
+            height: '250px',
+            type: "radialBar",
+        },
+        series: [value],
+        colors: ["#60beab"],
+        plotOptions: {
+            radialBar: {
+                hollow: {
+                    margin: 15,
+                    size: "60%"
+                },
                 startAngle: -135,
                 endAngle: 135,
-            },
-            dataLabels: {
-                name: {
-                    show: false,
+                track: {
+                    background: '#333',
+                    startAngle: -135,
+                    endAngle: 135,
                 },
-                value: {
-                    fontSize: "30px",
-                    show: true
+                dataLabels: {
+                    name: {
+                        show: false,
+                    },
+                    value: {
+                        fontSize: "30px",
+                        show: true
+                    }
                 }
             }
-        }
-    },
-    fill: {
-        type: "gradient",
-        gradient: {
-            shade: "dark",
-            type: "horizontal",
-            gradientToColors: ["#f79292"],
-            stops: [0, 100]
-        }
-    },
-};
+        },
+        fill: {
+            type: "gradient",
+            gradient: {
+                shade: "dark",
+                type: "horizontal",
+                gradientToColors: ["#f79292"],
+                stops: [0, 100]
+            }
+        },
+    };
 
 
-new ApexCharts(document.querySelector("#overall-score"), options2).render();
+    new ApexCharts(document.querySelector("#"+selector), options2).render();
+}
 function renderDonutChart(selector, values) {
 
     let donutChartEl = document.querySelector('#'+selector);

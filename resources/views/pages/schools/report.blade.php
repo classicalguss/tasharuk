@@ -168,10 +168,6 @@
                                         <textarea class="form-control" id="exampleFormControlTextarea1" rows="5"></textarea>
                                     </div>
                                 </div>
-                                <div class="mt-3 p-2" style="text-align: right; background: lightgray">
-                                    <h4 class="text-danger mb-0">{{$capability->name}} Final
-                                        Score: {{$surveyScores[$capability->id]}}</h4>
-                                </div>
                                 <hr class="solid" style="border-top: 3px solid #000;">
                             @endforeach
 

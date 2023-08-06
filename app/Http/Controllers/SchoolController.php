@@ -165,6 +165,7 @@ class SchoolController extends Controller
 			SchoolStakeholderWeight::updateOrCreate([
 				'school_id' => $schoolId,
 				'stakeholder_id' => $key,
+			], [
 				'weight' => $value
 			]);
 		}
@@ -172,30 +173,14 @@ class SchoolController extends Controller
 	}
 
 	public function updateStakeholderWeights(School $school, Request $request) {
-		$stakeholderWeights = SchoolStakeholderWeight::whereSchoolId($school->id)->get();
-		$stakeholders = Stakeholder::all();
-
-		//Only show updated stakeholder weights if they have the same stakeholder ids
-		if ($stakeholderWeights->pluck('stakeholder_id')->sort() == $stakeholders->pluck('id')->sort()) {
-			$stakeholderWeights = array_column($stakeholderWeights->toArray(), 'weight', 'stakeholder_id');
-			foreach ($stakeholders as &$stakeholder) {
-				$stakeholder['weight'] = $stakeholderWeights[$stakeholder->id];
-			}
-		} else {
-			foreach ($stakeholders as &$stakeholder) {
-				$stakeholder['weight'] = intval(100/count($stakeholders));
-			}
-		}
-
 		if ($request->expectsJson()) {
+			$stakeholders = SchoolStakeholderWeight::getStakeholderWeights($school->id);
 			return [
 				'data' => $stakeholders
 			];
 		}
 
-		return view('pages.schools.updateStakeholderWeights', [
-			'stakeholders' => $stakeholders
-		]);
+		return view('pages.schools.updateStakeholderWeights');
 
 	}
 }

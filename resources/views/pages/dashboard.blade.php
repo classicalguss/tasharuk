@@ -187,15 +187,39 @@
             </div>
         @endforeach
     </div>
+    <div class="divider my-4">
+        <div class="divider-text">By Capability</div>
+    </div>
+    <div class="row gy-4 justify-content-center">
+        @foreach($capabilitiesStakeholdersAverages as $capability => $capabilityAverages)
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center pb-0">
+                        <div>
+                            <h5 class="card-title mb-0">{{Str::title($capability)}}</h5>
+                            <small class="text-muted">From {{$surveyStats['Completed']}} surveys</small>
+                        </div>
+                    </div>
+                    <div id="school-stakeholder-performance-{{$capability}}"></div>
+                </div>
+            </div>
+        @endforeach
+    </div>
 @endsection
 
 @push('scripts')
     <script>
+        overallScore = {{$overallScore}};
+        renderRadial('overall-score', overallScore);
         renderDonutChart('surveyStats', {{Js::from($surveyStats)}})
         renderHorizontalChart('school-performance', {{Js::from($capabilitiesPerformance)}}, '300px')
         stakeholdersPerformance = {{Js::from($stakeholdersAverages)}};
         for (let key in stakeholdersPerformance) {
             renderHorizontalChart('school-stakeholder-performance-' + key, stakeholdersPerformance[key], '250px')
+        }
+        capabilitiesStakeholdersAverages = {{Js::from($capabilitiesStakeholdersAverages)}};
+        for (let key in capabilitiesStakeholdersAverages) {
+            renderHorizontalChart('school-stakeholder-performance-' + key, capabilitiesStakeholdersAverages[key], '250px')
         }
         initSchoolSelect($('#schoolSelect'));
     </script>

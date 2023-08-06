@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Capability;
 use App\Models\Indicator;
 use App\Models\School;
+use App\Models\Stakeholder;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
 use App\Models\SurveyScore;
@@ -78,13 +79,34 @@ class DashboardController extends Controller
 			}
 		}
 
+		$stakeholders = array_column(Stakeholder::all()->toArray(), 'name', 'id');
+		$capabilities = array_column(Capability::all()->toArray(), 'name', 'id');
+
+
+		$capabilityStakeholdersAverages = SurveyScore::selectRaw('capability_id, stakeholder_id, avg(score) as average')
+			->groupByRaw('capability_id, stakeholder_id')->get();
+		$capabilityStakeholdersAverages = $capabilityStakeholdersAverages->groupBy('capability_id');
+		$capabilityStakeholdersAveragesChartData = [];
+
+		foreach ($capabilityStakeholdersAverages as $capabilityKey => $averages) {
+			$capabilityName = Str::snake($capabilities[$capabilityKey]);
+			$capabilityStakeholdersAveragesChartData[$capabilityName] = [];
+			foreach ($averages as $average) {
+				$stakeholderName = Str::snake($stakeholders[$average['stakeholder_id']]);
+				$capabilityStakeholdersAveragesChartData[$capabilityName][$stakeholderName] = $average['average'];
+			}
+		}
+
 		return view('pages.dashboard', [
 			'schools' => School::all(),
 			'surveyAvgTime' => (int) $surveyAverageTime.' days',
+			'overallScore' => SurveyScore::getOverallScore() ?? 0,
 			'usersCount' => User::count(),
 			'schoolsCount' => School::count(),
 			'surveyStats' => $surveyStats,
 			'capabilitiesPerformance' => $capabilityAverages,
+			'capabilitiesStakeholdersAverages' => $capabilityStakeholdersAveragesChartData,
+			'stakeholders' => $stakeholders,
 			'stakeholdersAverages' => $stakeholdersAverages
 		]);
     }

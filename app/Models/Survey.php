@@ -3,18 +3,13 @@
 namespace App\Models;
 
 use App\Models\Scopes\SchoolScope;
+use App\Traits\SchoolFilterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Survey extends Model
 {
-    use HasFactory;
-	protected static function booted()
-	{
-		if (request()->get('school_id')) {
-			static::addGlobalScope(new SchoolScope(request()->get('school_id')));
-		}
-	}
+    use HasFactory, SchoolFilterable;
 	public function school() {
 		return $this->belongsTo(School::class);
 	}

@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\SchoolFilterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SurveyScore extends Model
 {
-    use HasFactory;
+    use HasFactory, SchoolFilterable;
 
 	public function survey()
 	{
@@ -17,6 +18,18 @@ class SurveyScore extends Model
 	public function capability()
 	{
 		return $this->belongsTo(Capability::class);
+	}
+
+	public static function getOverallScore(): float|int
+	{
+		$stakeholders = SchoolStakeholderWeight::getStakeholderWeights();
+		$overallScore = 0;
+		foreach ($stakeholders as $stakeholder) {
+			$average = SurveyScore::whereStakeholderId($stakeholder->id)->pluck('score')->average() / 100;
+			$overallScore += $average * $stakeholder['weight'];
+		}
+
+		return round($overallScore);
 	}
 
 	public function generateScores(Survey $survey) {
@@ -41,6 +54,8 @@ class SurveyScore extends Model
 				$surveySubcapabilityScore->score = $subcapabilityAverage;
 				$surveySubcapabilityScore->survey_id = $survey->id;
 				$surveySubcapabilityScore->subcapability_id = $subcapability->id;
+				$surveySubcapabilityScore->school_id = $survey->school_id;
+				$surveySubcapabilityScore->stakeholder_id = $survey->stakeholder_id;
 				$surveySubcapabilityScore->save();
 
 				if (isset($capabilityScores[$capability->id]))
@@ -54,6 +69,8 @@ class SurveyScore extends Model
 			$surveyScore->survey_id = $survey->id;
 			$surveyScore->capability_id = $key;
 			$surveyScore->score = $score;
+			$surveyScore->school_id = $survey->school_id;
+			$surveyScore->stakeholder_id = $survey->stakeholder_id;
 			$surveyScore->save();
 		}
 	}
