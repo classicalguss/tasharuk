@@ -38,25 +38,10 @@ class CapabilityController extends Controller
 			$overrides = OverrideCapability::where([
 				'updated_model' => 'capability',
 				'foreign_id' => $capability->id,
-				'stakeholder_id' => $stakeholderId,
-				'school_id' => $schoolId
-			])->get();
-
-			if (count($overrides) == 0)
-				$overrides = OverrideCapability::where([
-					'updated_model' => 'capability',
-					'foreign_id' => $capability->id,
-					'stakeholder_id' => 0,
-					'school_id' => $schoolId
-				])->get();
-
-			if (count($overrides) == 0)
-				$overrides = OverrideCapability::where([
-					'updated_model' => 'capability',
-					'foreign_id' => $capability->id,
-					'stakeholder_id' => $stakeholderId,
-					'school_id' => 0
-				])->get();
+			])
+				->whereIn('stakeholder_id', [$stakeholderId, 0])
+				->whereIn('school_id', [$schoolId, 0])
+				->orderBy('school_id')->orderBy('stakeholder_id')->get();
 
 			foreach ($overrides as $override) {
 				$updatedColumn = $override->updated_column;
