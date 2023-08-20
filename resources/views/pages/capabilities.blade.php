@@ -47,6 +47,7 @@
 	    'fields' => [
 			['name' => 'response', 'value' => 'full-reload', 'type' => 'hidden'],
 			['name' => 'stakeholder_id', 'value' => request()->get('stakeholder_id'), 'type' => 'hidden'],
+			['name' => 'school_id', 'value' => request()->get('school_id'), 'type' => 'hidden'],
 			['name' => 'name', 'type'=>'text'],
         ],
         'action' => 'update'

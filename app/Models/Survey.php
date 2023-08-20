@@ -34,16 +34,6 @@ class Survey extends Model
 		return substr(md5(rand(0, 9) . $email . time()), 0, 32);
 	}
 
-	public function getNextSubcapability()
-	{
-		$subcapability = Subcapability::where([
-			'capability_id' => $this->capability_id
-		])->where('id', '>', $this->subcapability_id)->first();
-		$this->subcapability_id = $subcapability->id;
-		$this->indicator_id = 0;
-		$this->getNextIndicator();
-	}
-
 	public function currentCapability()
 	{
 		return Capability::where('id', '>', $this->indicator->subcapability->capability_id)->first();
@@ -59,6 +49,17 @@ class Survey extends Model
 		else
 			$builder->where('id', '>', $this->indicator->subcapability_id);
 		return $builder->first();
+	}
+
+	public static function getFirstCapability(School $school, Stakeholder $stakeholder) {
+
+		$overrides = OverrideCapability::where([
+			'updated_model' => 'capability',
+		])
+			->whereIn('stakeholder_id', [$stakeholder->id, 0])
+			->whereIn('school_id', [$school->id, 0])
+			->whereT
+			->orderBy('school_id')->orderBy('stakeholder_id')->get();
 	}
 
 	public function currentIndicator($subcapabilityId, $first = false)

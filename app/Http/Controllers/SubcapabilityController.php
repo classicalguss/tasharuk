@@ -6,6 +6,8 @@ use App\Http\Requests\StoreCapabilityRequest;
 use App\Http\Requests\UpdateCapabilityRequest;
 use App\Models\Capability;
 use App\Models\OverrideCapability;
+use App\Models\School;
+use App\Models\Stakeholder;
 use App\Models\Subcapability;
 use Illuminate\Http\Request;
 
@@ -13,7 +15,9 @@ class SubcapabilityController extends Controller
 {
 	public function SubcapabilitiesManagement(Capability $capability) {
 		return view('pages.subcapabilities', [
-			'capability' => $capability
+			'capability' => $capability,
+			'stakeholders' => Stakeholder::all(),
+			'schools' => School::all()
 		]);
 	}
 
@@ -22,23 +26,21 @@ class SubcapabilityController extends Controller
      */
     public function index(Request $request, Capability $capability)
     {
+		$subcapabilities = Subcapability::whereCapabilityId($capability->id)->get();
 		$stakeholderId = $request->get('stakeholder_id');
 		$schoolId = $request->get('school_id');
-		$subcapabilities = Subcapability::whereCapabilityId($capability->id)->get();
+		$allOverrides = (new OverrideCapability())->getModelOverrides('subcapability', $schoolId, $stakeholderId);
+		$allOverrides = $allOverrides->groupBy('foreign_id');
 		foreach ($subcapabilities as $subcapability) {
-
-			$overrides = OverrideCapability::where([
-				'updated_model' => 'subcapability',
-				'foreign_id' => $subcapability->id,
-				'stakeholder_id' => $stakeholderId,
-				'school_id' => $schoolId
-			])->get();
-			foreach ($overrides as $override) {
-				$updatedColumn = $override->updated_column;
-				$newValue = $override->new_value;
-				if (ctype_digit($newValue))
-					$newValue = (int)$newValue;
-				$subcapability->$updatedColumn = $newValue;
+			if (isset($allOverrides[$subcapability->id])) {
+				$overrides = $allOverrides[$subcapability->id];
+				foreach ($overrides as $override) {
+					$updatedColumn = $override->updated_column;
+					$newValue = $override->new_value;
+					if (ctype_digit($newValue))
+						$newValue = (int)$newValue;
+					$subcapability->$updatedColumn = $newValue;
+				}
 			}
 		}
 		return response()->json([
@@ -89,22 +91,29 @@ class SubcapabilityController extends Controller
      */
     public function update(UpdateCapabilityRequest $request, Capability $capability, Subcapability $subcapability)
     {
-		$stakeholderId = $request->post('stakeholder_id');
-		$schoolId = $request->post('stakeholder_id');
-		if ($stakeholderId || $schoolId)
-			foreach ($request->validated() as $key => $value) {
-				OverrideCapability::updateOrCreate([
-					'updated_model' => 'subcapability',
-					'updated_column' => $key,
-					'foreign_id' => $subcapability->id,
-					'stakeholder_id' => $stakeholderId,
-					'school_id' => $schoolId
-				],[
-					'new_value' => $value
-				]);
+		$stakeholderId = $request->post('stakeholder_id',0);
+		$schoolId = $request->post('school_id',0);
+		if ($schoolId || $stakeholderId) {
+			if ($request->has('is_visible')) {
+				$key = "is_visible";
+				$value = $request->post('is_visible');
+			} else {
+				$key = "name";
+				$value = $request->post('name');
 			}
+			OverrideCapability::updateOrCreate([
+				'updated_model' => 'subcapability',
+				'updated_column' => $key,
+				'foreign_id' => $capability->id,
+				'stakeholder_id' => $stakeholderId,
+				'school_id' => $schoolId
+			],[
+				'new_value' => $value
+			]);
+		}
 		else
 			$subcapability->update($request->validated());
+
 		if ($request->post('response') == 'full-reload')
 			return redirect()->back();
 

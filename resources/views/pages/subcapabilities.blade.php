@@ -24,7 +24,7 @@
         </li>
         <li class="breadcrumb-item active">{{$capability->name}}</li>
     </ol>
-    @if(!request()->get('stakeholder_id'))
+    @if(!request()->get('stakeholder_id') && !request()->get('school_id'))
         <x-button class="mb-3 me-2" data-bs-toggle="modal" data-bs-target="#createModal">
             Add Subcapability
         </x-button>
@@ -32,16 +32,43 @@
             'title' => 'Add Subcapability',
             'url' => url('resource/capabilities/'.$capability['id'].'/subcapabilities'),
             'fields' => [
-                ['name' => 'name', 'type' => 'text']
+                ['name' => 'name', 'type' => 'text'],
             ]
         ])
     @endif
+    <div class="row mt-2 mb-2">
+        <div class="col-lg-4">
+            <select id="schoolSelect" class="form-select form-select-sm">
+                <option value="0">-- No school selected --</option>
+                @foreach($schools as $school)
+                    <option
+                            @if ($school->id == request()->get('school_id'))
+                                selected="selected"
+                            @endif
+                            value="{{$school->id}}">{{$school->name}}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-lg-4">
+            <select id="stakeholderSelect" class="form-select form-select-sm">
+                <option value="0">-- No stakeholder selected --</option>
+                @foreach($stakeholders as $stakeholder)
+                    <option
+                            @if ($stakeholder->id == request()->get('stakeholder_id'))
+                                selected="selected"
+                            @endif
+                            value="{{$stakeholder->id}}">{{$stakeholder->name}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
     @include('components.form-modal', [
         'title' => 'Update Capability',
         'url' => url('resource/capabilities/'.$capability['id'].'/subcapabilities'),
         'fields' => [
             ['name' => 'response', 'value' => 'full-reload', 'type' => 'hidden'],
             ['name' => 'stakeholder_id', 'value' => request()->get('stakeholder_id'), 'type' => 'hidden'],
+			['name' => 'school_id', 'value' => request()->get('school_id'), 'type' => 'hidden'],
             ['name' => 'name', 'type'=>'text'],
         ],
         'action' => 'update'
@@ -73,6 +100,8 @@
                 schoolId = parseInt({{request()->get('school_id', 0)}})
                 fetchSubcapabilities({{$capability->id}});
             })
+            initSchoolSelect($('#schoolSelect'));
+            initStakeholdersSelect($('#stakeholderSelect'));
         </script>
     @endpush
 @endonce

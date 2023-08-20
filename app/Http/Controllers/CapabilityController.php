@@ -33,22 +33,18 @@ class CapabilityController extends Controller
 		$capabilities = Capability::all();
 		$stakeholderId = $request->get('stakeholder_id');
 		$schoolId = $request->get('school_id');
+		$allOverrides = (new OverrideCapability())->getModelOverrides('capability', $schoolId, $stakeholderId);
+		$allOverrides = $allOverrides->groupBy('foreign_id');
 		foreach ($capabilities as $capability) {
-
-			$overrides = OverrideCapability::where([
-				'updated_model' => 'capability',
-				'foreign_id' => $capability->id,
-			])
-				->whereIn('stakeholder_id', [$stakeholderId, 0])
-				->whereIn('school_id', [$schoolId, 0])
-				->orderBy('school_id')->orderBy('stakeholder_id')->get();
-
-			foreach ($overrides as $override) {
-				$updatedColumn = $override->updated_column;
-				$newValue = $override->new_value;
-				if (ctype_digit($newValue))
-					$newValue = (int)$newValue;
-				$capability->$updatedColumn = $newValue;
+			if (isset($allOverrides[$capability->id])) {
+				$overrides = $allOverrides[$capability->id];
+				foreach ($overrides as $override) {
+					$updatedColumn = $override->updated_column;
+					$newValue = $override->new_value;
+					if (ctype_digit($newValue))
+						$newValue = (int)$newValue;
+					$capability->$updatedColumn = $newValue;
+				}
 			}
 		}
 		return response()->json([
@@ -90,20 +86,26 @@ class CapabilityController extends Controller
      */
     public function update(UpdateCapabilityRequest $request, Capability $capability)
     {
-		$stakeholderId = $request->post('stakeholder_id');
-		$schoolId = $request->post('school_id');
-		if ($schoolId || $stakeholderId)
-			foreach ($request->validated() as $key => $value) {
-				OverrideCapability::updateOrCreate([
-					'updated_model' => 'capability',
-					'updated_column' => $key,
-					'foreign_id' => $capability->id,
-					'stakeholder_id' => $stakeholderId,
-					'school_id' => $schoolId
-				],[
-					'new_value' => $value
-				]);
+		$stakeholderId = $request->post('stakeholder_id', 0);
+		$schoolId = $request->post('school_id', 0);
+		if ($schoolId || $stakeholderId) {
+			if ($request->has('is_visible')) {
+				$key = "is_visible";
+				$value = $request->post('is_visible');
+			} else {
+				$key = "name";
+				$value = $request->post('name');
 			}
+			OverrideCapability::updateOrCreate([
+				'updated_model' => 'capability',
+				'updated_column' => $key,
+				'foreign_id' => $capability->id,
+				'stakeholder_id' => $stakeholderId,
+				'school_id' => $schoolId
+			],[
+				'new_value' => $value
+			]);
+		}
 		else
 			$capability->update($request->validated());
 

@@ -28,7 +28,33 @@
             {{$subcapability->name}}
         </li>
     </ol>
-    @if(!request()->get('stakeholder_id'))
+    <div class="row mt-2 mb-2">
+        <div class="col-lg-4">
+            <select id="schoolSelect" class="form-select form-select-sm">
+                <option value="0">-- No school selected --</option>
+                @foreach($schools as $school)
+                    <option
+                            @if ($school->id == request()->get('school_id'))
+                                selected="selected"
+                            @endif
+                            value="{{$school->id}}">{{$school->name}}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-lg-4">
+            <select id="stakeholderSelect" class="form-select form-select-sm">
+                <option value="0">-- No stakeholder selected --</option>
+                @foreach($stakeholders as $stakeholder)
+                    <option
+                            @if ($stakeholder->id == request()->get('stakeholder_id'))
+                                selected="selected"
+                            @endif
+                            value="{{$stakeholder->id}}">{{$stakeholder->name}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+    @if(!request()->get('stakeholder_id') && !request()->get('school_id'))
         <x-button class="mb-3 me-2" data-bs-toggle="modal" data-bs-target="#createModal">
             Add Indicator
         </x-button>
@@ -97,6 +123,8 @@
                 schoolId = parseInt({{request()->get('school_id', 0)}})
                 fetchIndicators({{$subcapability->id}});
             })
+            initSchoolSelect($('#schoolSelect'));
+            initStakeholdersSelect($('#stakeholderSelect'));
         </script>
     @endpush
 @endonce

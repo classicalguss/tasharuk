@@ -8,6 +8,8 @@ use App\Http\Requests\UpdateCapabilityRequest;
 use App\Models\Capability;
 use App\Models\Indicator;
 use App\Models\OverrideCapability;
+use App\Models\School;
+use App\Models\Stakeholder;
 use App\Models\Subcapability;
 use Illuminate\Http\Request;
 
@@ -17,7 +19,9 @@ class IndicatorController extends Controller
 	{
 		return view('pages.indicators', [
 			'subcapability' => $subcapability,
-			'capability' => $subcapability->capability
+			'capability' => $subcapability->capability,
+			'stakeholders' => Stakeholder::all(),
+			'schools' => School::all()
 		]);
 	}
 
