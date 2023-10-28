@@ -2,41 +2,23 @@
 
 namespace App\Models;
 
-use App\Traits\SchoolFilterable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Arr;
 use Illuminate\Database\Eloquent\Model;
 
 class SurveyScore extends Model
 {
-    use HasFactory, SchoolFilterable;
-
-	public function survey()
+	public function generateScores(Survey $survey): void
 	{
-		return $this->belongsTo(Survey::class);
-	}
-
-	public function capability()
-	{
-		return $this->belongsTo(Capability::class);
-	}
-
-	public static function getOverallScore(): float|int
-	{
-		$stakeholders = SchoolStakeholderWeight::getStakeholderWeights();
-		$overallScore = 0;
-		foreach ($stakeholders as $stakeholder) {
-			$average = SurveyScore::whereStakeholderId($stakeholder->id)->pluck('score')->average() / 100;
-			$overallScore += $average * $stakeholder['weight'];
-		}
-
-		return round($overallScore);
-	}
-
-	public function generateScores(Survey $survey) {
 		$subcapabilitiesScores = [];
 		$capabilityScores = [];
-		foreach ($survey->answers as $answer)
-		{
+		$capabilities = Capability::all();
+		$capabilities = (new OverrideCapability())->getModelOverrides($capabilities, $survey->school_id, $survey->stakeholder_id);
+		$capabilities = $capabilities->keyBy('id');
+		$subcapabilities = Subcapability::all();
+		$subcapabilities = (new OverrideCapability())->getModelOverrides($subcapabilities, $survey->school_id, $survey->stakeholder_id);
+		$subcapabilities = $subcapabilities->keyBy('id');
+
+		foreach ($survey->answers as $answer) {
 			$subcapability = $answer->indicator->subcapability;
 			if (!isset($subcapabilitiesScores[$subcapability->id]))
 				$subcapabilitiesScores[$subcapability->id] = [$answer->score];
@@ -44,34 +26,37 @@ class SurveyScore extends Model
 				$subcapabilitiesScores[$subcapability->id][] = $answer->score;
 		}
 
-		$capabilities = Capability::all();
-		foreach ($capabilities as $capability)
-			foreach ($capability->subcapabilities as $subcapability) {
-				$subcapabilityScores = $subcapabilitiesScores[$subcapability->id];
-				$subcapabilityAverage = array_sum($subcapabilityScores) / count($subcapabilityScores);
+		foreach ($subcapabilitiesScores as $key => $scores) {
 
-				$surveySubcapabilityScore = new SurveySubcapabilityScore();
-				$surveySubcapabilityScore->score = $subcapabilityAverage;
-				$surveySubcapabilityScore->survey_id = $survey->id;
-				$surveySubcapabilityScore->subcapability_id = $subcapability->id;
-				$surveySubcapabilityScore->school_id = $survey->school_id;
-				$surveySubcapabilityScore->stakeholder_id = $survey->stakeholder_id;
-				$surveySubcapabilityScore->save();
+			$subcapabilityScore = new SurveySubcapabilityScore();
+			$subcapabilityScore->survey_id = $survey->id;
+			$subcapabilityScore->school_id = $survey->school_id;
+			$subcapabilityScore->stakeholder_id = $survey->stakeholder_id;
+			$subcapabilityScore->subcapability_id = $key;
+			$score = (array_sum($scores) / count($scores)) * 20;
+			$subcapabilityScore->score = $score;
+			$subcapabilityScore->save();
 
-				if (isset($capabilityScores[$capability->id]))
-					$capabilityScores[$capability->id] += $subcapabilityAverage / 5 * $subcapability->weight;
-				else
-					$capabilityScores[$capability->id] = $subcapabilityAverage / 5 * $subcapability->weight;
-			}
+			$capabilityId = $subcapabilities[$key]->capability_id;
+			$weightedScore = $score / 100 * $subcapabilities[$key]->weight;
+			if (isset($capabilityScores[$capabilityId]))
+				$capabilityScores[$capabilityId] += $weightedScore;
+			else
+				$capabilityScores[$capabilityId] = $weightedScore;
+		}
 
 		foreach ($capabilityScores as $key => $score) {
-			$surveyScore = new  SurveyScore();
-			$surveyScore->survey_id = $survey->id;
-			$surveyScore->capability_id = $key;
-			$surveyScore->score = $score;
-			$surveyScore->school_id = $survey->school_id;
-			$surveyScore->stakeholder_id = $survey->stakeholder_id;
-			$surveyScore->save();
+			$capabilityScore = new SurveyCapabilityScore();
+			$capabilityScore->survey_id = $survey->id;
+			$capabilityScore->school_id = $survey->school_id;
+			$capabilityScore->stakeholder_id = $survey->stakeholder_id;
+			$capabilityScore->capability_id = $key;
+			$capabilityScore->score = round($score);
+			$capabilityScore->save();
 		}
+
+		$survey->status = 'completed';
+		$survey->save();
+
 	}
 }

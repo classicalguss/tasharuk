@@ -9,7 +9,7 @@ use App\Models\SchoolStakeholderWeight;
 use App\Models\Stakeholder;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
-use App\Models\SurveyScore;
+use App\Models\SurveyCapabilityScore;
 use App\Models\SurveySubcapabilityScore;
 use Illuminate\Http\Request;
 
@@ -82,7 +82,7 @@ class SchoolController extends Controller
 		$capabilities = Capability::whereId(1)->get();
 		$surveyIds = Survey::whereSchoolId($school->id)->get()->pluck('id');
 
-		$surveyScores = SurveyScore::selectRaw('capability_id, round(avg(score), 2) as average')
+		$surveyScores = SurveyCapabilityScore::selectRaw('capability_id, round(avg(score), 2) as average')
 			->whereIn('survey_id', $surveyIds)->groupBy('capability_id')->get()->toArray();
 		$surveyScores = array_column($surveyScores, 'average', 'capability_id');
 

@@ -14,10 +14,20 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class CapabilityController extends Controller
 {
-	public function CapabilityManagement() {
+	public function CapabilityManagement(Request $request) {
+		$school = null;
+		if ($request->get('school_id')) {
+			$school = School::find($request->get('school_id'));
+		}
+		$stakeholder = null;
+		if ($request->get('stakeholder_id')) {
+			$stakeholder = Stakeholder::find($request->get('stakeholder_id'));
+		}
 		return view('pages.capabilities', [
 			'stakeholders' => Stakeholder::all(),
-			'schools' => School::all()
+			'schools' => School::all(),
+			'school' => $school,
+			'stakeholder' => $stakeholder
 		]);
 	}
 
@@ -33,20 +43,8 @@ class CapabilityController extends Controller
 		$capabilities = Capability::all();
 		$stakeholderId = $request->get('stakeholder_id');
 		$schoolId = $request->get('school_id');
-		$allOverrides = (new OverrideCapability())->getModelOverrides('capability', $schoolId, $stakeholderId);
-		$allOverrides = $allOverrides->groupBy('foreign_id');
-		foreach ($capabilities as $capability) {
-			if (isset($allOverrides[$capability->id])) {
-				$overrides = $allOverrides[$capability->id];
-				foreach ($overrides as $override) {
-					$updatedColumn = $override->updated_column;
-					$newValue = $override->new_value;
-					if (ctype_digit($newValue))
-						$newValue = (int)$newValue;
-					$capability->$updatedColumn = $newValue;
-				}
-			}
-		}
+		if ($schoolId || $stakeholderId)
+			$capabilities = (new OverrideCapability())->getModelOverrides($capabilities, $schoolId, $stakeholderId);
 		return response()->json([
 			'data' => $capabilities
 		]);

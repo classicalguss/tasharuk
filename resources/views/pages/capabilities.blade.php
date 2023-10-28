@@ -36,7 +36,7 @@
             ]
         ])
     @else
-        <h4>Overriding capabilities</h4>
+        <h4>Overriding capabilities for {{$school ? $school->name : $stakeholder->name}} </h4>
     @endif
     <x-secondary-button onclick="updateWeights('capabilities')" class="mb-3 d-none" id="updateWeightsButton">Update
         weights

@@ -29,20 +29,8 @@ class SubcapabilityController extends Controller
 		$subcapabilities = Subcapability::whereCapabilityId($capability->id)->get();
 		$stakeholderId = $request->get('stakeholder_id');
 		$schoolId = $request->get('school_id');
-		$allOverrides = (new OverrideCapability())->getModelOverrides('subcapability', $schoolId, $stakeholderId);
-		$allOverrides = $allOverrides->groupBy('foreign_id');
-		foreach ($subcapabilities as $subcapability) {
-			if (isset($allOverrides[$subcapability->id])) {
-				$overrides = $allOverrides[$subcapability->id];
-				foreach ($overrides as $override) {
-					$updatedColumn = $override->updated_column;
-					$newValue = $override->new_value;
-					if (ctype_digit($newValue))
-						$newValue = (int)$newValue;
-					$subcapability->$updatedColumn = $newValue;
-				}
-			}
-		}
+		$subcapabilities = (new OverrideCapability())->getModelOverrides($subcapabilities, $schoolId, $stakeholderId);
+
 		return response()->json([
 			'data' => $subcapabilities
 		]);

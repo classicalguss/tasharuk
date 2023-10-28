@@ -8,7 +8,7 @@ use App\Models\School;
 use App\Models\Stakeholder;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
-use App\Models\SurveyScore;
+use App\Models\SurveyCapabilityScore;
 use App\Models\User;
 use DB;
 use Illuminate\Http\Request;
@@ -39,7 +39,7 @@ class DashboardController extends Controller
 		$surveys = Survey::all();
 		$surveyIds = $surveys->pluck('id');
 
-		$surveyScores = SurveyScore::whereIn('survey_id', $surveyIds)->with('capability', 'survey')->get();
+		$surveyScores = SurveyCapabilityScore::whereIn('survey_id', $surveyIds)->with('capability', 'survey')->get();
 		$capabilityScores = [];
 		$stakeholdersScores = [];
 		//Preparing Array
@@ -83,7 +83,7 @@ class DashboardController extends Controller
 		$capabilities = array_column(Capability::all()->toArray(), 'name', 'id');
 
 
-		$capabilityStakeholdersAverages = SurveyScore::selectRaw('capability_id, stakeholder_id, avg(score) as average')
+		$capabilityStakeholdersAverages = SurveyCapabilityScore::selectRaw('capability_id, stakeholder_id, avg(score) as average')
 			->groupByRaw('capability_id, stakeholder_id')->get();
 		$capabilityStakeholdersAverages = $capabilityStakeholdersAverages->groupBy('capability_id');
 		$capabilityStakeholdersAveragesChartData = [];
@@ -100,7 +100,7 @@ class DashboardController extends Controller
 		return view('pages.dashboard', [
 			'schools' => School::all(),
 			'surveyAvgTime' => (int) $surveyAverageTime.' days',
-			'overallScore' => SurveyScore::getOverallScore() ?? 0,
+			'overallScore' => SurveyCapabilityScore::getOverallScore() ?? 0,
 			'usersCount' => User::count(),
 			'schoolsCount' => School::count(),
 			'surveyStats' => $surveyStats,

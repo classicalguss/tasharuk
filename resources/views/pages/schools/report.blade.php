@@ -84,7 +84,15 @@
                                 <label for="exampleFormControlTextarea1" class="form-label">Executive Summary</label>
                                 <textarea class="form-control" id="exampleFormControlTextarea1" rows="5"></textarea>
                             </div>
+                            <div class="divider my-4">
+                                <div class="divider-text"><h4 style="color: darkblue; margin: 0"><b>Score overview</b></h4></div>
+                                <div class="row">
+                                    <div class="col-md-8 overall-chart">
 
+                                    </div>
+                                    <div style="padding-bottom: 100px" class="d-flex align-items-center col-md-4 overall-radial"></div>
+                                </div>
+                            </div>
                             <div class="divider my-4">
                                 <div class="divider-text"><h4 style="color: darkblue; margin: 0"><b>Audit Areas</b></h4></div>
                             </div>

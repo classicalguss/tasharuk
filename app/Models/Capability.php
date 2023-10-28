@@ -38,7 +38,7 @@ class Capability extends Model
 			$subcapabilityIds = Subcapability::where('capability_id')->get()->pluck('id');
 			Indicator::whereIn('subcapability_id', $subcapabilityIds)->delete();
 			Subcapability::whereCapabilityId($capability->id)->delete();
-			SurveyScore::whereCapabilityId($capability->id)->delete();
+			SurveyCapabilityScore::whereCapabilityId($capability->id)->delete();
 		});
 	}
 

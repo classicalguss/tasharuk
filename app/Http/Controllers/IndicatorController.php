@@ -3,9 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\IndicatorRequest;
-use App\Http\Requests\StoreCapabilityRequest;
-use App\Http\Requests\UpdateCapabilityRequest;
-use App\Models\Capability;
 use App\Models\Indicator;
 use App\Models\OverrideCapability;
 use App\Models\School;

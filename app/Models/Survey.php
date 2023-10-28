@@ -83,14 +83,19 @@ class Survey extends Model
 				$capability = $this->currentCapability();
 				if (!$capability)
 				{
-					$schoolScore = new SurveyScore();
-					$schoolScore->generateScores($this);
-					$this->status = 'completed';
-					$this->completed_at = now();
+					$schoolCapabilityScore = new SurveyScore();
+					$schoolCapabilityScore->generateScores($this);
 					$this->save();
 					return;
 				}
 				$subcapability = $this->currentSubcapability($capability->id, true);
+				if (!$subcapability)
+				{
+					$schoolCapabilityScore = new SurveyScore();
+					$schoolCapabilityScore->generateScores($this);
+					$this->save();
+					return;
+				}
 			}
 			$indicator = $this->currentIndicator($subcapability->id, true);
 		}
