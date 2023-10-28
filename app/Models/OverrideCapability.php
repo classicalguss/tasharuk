@@ -29,6 +29,8 @@ class OverrideCapability extends Model
 
 	public function getModelOverrides(Collection $models, int $schoolId, int $stakeholderId)
 	{
+		if ($models->isEmpty())
+			return $models;
 		$objectName = Str::lower((new \ReflectionClass($models[0]))->getShortName());
 		$allOverrides = OverrideCapability::where([
 			'updated_model' => $objectName,
