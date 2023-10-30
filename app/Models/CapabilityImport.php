@@ -49,11 +49,11 @@ class CapabilityImport implements ToCollection
 					Indicator::create([
 						'text' => $indicator[0],
 						'subcapability_id' => $subcapability->id,
-						'highly_effective' => $indicator[1],
-						'effective' => $indicator[2],
-						'satisfactory' => $indicator[3],
-						'needs_improvement' => $indicator[4],
-						'does_not_meet_standard' => $indicator[5],
+						'highly_effective' => $indicator[1] ?? "",
+						'effective' => $indicator[2] ?? "",
+						'satisfactory' => $indicator[3] ?? "",
+						'needs_improvement' => $indicator[4] ?? "",
+						'does_not_meet_standard' => $indicator[5] ?? "",
 					]);
 				}
 			}
