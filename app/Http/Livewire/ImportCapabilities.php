@@ -20,6 +20,7 @@ class ImportCapabilities extends Component
 		DB::table('capabilities')->truncate();
 		DB::table('subcapabilities')->truncate();
 		DB::table('indicators')->truncate();
+		DB::table('override_capabilities')->truncate();
 
 		Excel::import(new CapabilityImport(), $this->excelFile);
 		sleep(1);

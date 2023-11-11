@@ -46,12 +46,11 @@ function fetchIndicators(subcapabilityId) {
                     $(row).addClass('text-muted');
                 }
             },
+            scrollX: true,
             paging: false,
             info: false,
             processing: true,
             serverSide: true,
-            responsive: true,
-            fixedColumns: true,
             searching: false,
             ordering: false,
             ajax: {
