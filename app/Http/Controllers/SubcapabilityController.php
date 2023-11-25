@@ -92,7 +92,7 @@ class SubcapabilityController extends Controller
 			OverrideCapability::updateOrCreate([
 				'updated_model' => 'subcapability',
 				'updated_column' => $key,
-				'foreign_id' => $capability->id,
+				'foreign_id' => $subcapability->id,
 				'stakeholder_id' => $stakeholderId,
 				'school_id' => $schoolId
 			],[

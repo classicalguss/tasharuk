@@ -68,9 +68,12 @@ class SurveyController extends Controller
 	{
 		$data = [];
 		$emails = json_decode($request->post('mailing-list'), true);
-		$firstCapability = Capability::first();
-		$firstSubcapability = Subcapability::whereCapabilityId($firstCapability->id)->first();
-		$firstIndicator = Indicator::whereSubcapabilityId($firstSubcapability->id)->first();
+
+		$survey = new Survey();
+		$survey->stakeholder_id = $request->post('stakeholder_id');
+		$survey->school_id = $request->post('school_id');
+		$survey->initialize();
+
 		$school = School::find($request->post('school_id'));
 		foreach ($emails as $email) {
 			$token = Survey::generateInvitationToken($email['value']);
@@ -78,7 +81,7 @@ class SurveyController extends Controller
 				'receiver_email' => $email['value'],
 				'stakeholder_id' => $request->post('stakeholder_id'),
 				'school_id' => $school->id,
-				'indicator_id' => $firstIndicator->id,
+				'indicator_id' => $survey->indicator_id,
 				'status' => 'not_started',
 				"created_at" => date('Y-m-d H:i:s'),
 				"updated_at" => date('Y-m-d H:i:s'),

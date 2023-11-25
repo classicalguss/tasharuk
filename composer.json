@@ -19,6 +19,8 @@
     "mbezhanov/faker-provider-collection": "^2.0",
     "mediconesystems/livewire-datatables": "dev-mark-branch-l10",
     "spatie/laravel-permission": "^5.10",
+    "symfony/http-client": "^6.2",
+    "symfony/postmark-mailer": "^6.3",
     "yoeunes/toastr": "^2.3"
   },
   "require-dev": {

@@ -6,6 +6,7 @@ use App\Models\Scopes\SchoolScope;
 use App\Traits\SchoolFilterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
 
 class Survey extends Model
 {
@@ -34,72 +35,79 @@ class Survey extends Model
 		return substr(md5(rand(0, 9) . $email . time()), 0, 32);
 	}
 
-	public function currentCapability()
+	public function nextCapability(Capability $capability = null): ?Capability
 	{
-		return Capability::where('id', '>', $this->indicator->subcapability->capability_id)->first();
+		$capabilityId = $capability ? $capability->id : 0;
+		$capability = Capability::where('id', '>', $capabilityId)->orderBy('id')->first();
+		if (!$capability)
+			return null; //no more capabilities in the system
+
+		$capability = (new OverrideCapability())->getModelOverrides(Collection::make([$capability]), $this->school_id, $this->stakeholder_id)->first();
+		if (!$capability->is_visible)
+			return $this->nextCapability($capability); //Capability should be hidden, go to next
+
+		return $capability;
 	}
 
-	public function currentSubcapability($capabilityId, $first = false)
+	public function nextSubcapability(Capability $capability, Subcapability $subcapability = null)
 	{
-		$builder = Subcapability::where([
-			'capability_id' => $capabilityId
-		]);
-		if ($first)
-			$builder->where('id', '>', 0);
-		else
-			$builder->where('id', '>', $this->indicator->subcapability_id);
-		return $builder->first();
+		$subcapabilityId = $subcapability ? $subcapability->id : 0;
+		$subcapability = Subcapability::where('id', '>', $subcapabilityId)
+			->whereCapabilityId($capability->id)
+			->orderBy('id')->first();
+		if (!$subcapability) {
+			$capability = $this->nextCapability($capability);
+			if (!$capability)
+				return null;
+			return $this->nextSubcapability($capability);
+		}
+
+		$subcapability = (new OverrideCapability())
+			->getModelOverrides(Collection::make([$subcapability]), $this->school_id, $this->stakeholder_id)->first();
+		if (!$subcapability->is_visible)
+			return $this->nextSubcapability($capability, $subcapability);
+
+		return $subcapability;
 	}
 
-	public static function getFirstCapability(School $school, Stakeholder $stakeholder) {
-
-		$overrides = OverrideCapability::where([
-			'updated_model' => 'capability',
-		])
-			->whereIn('stakeholder_id', [$stakeholder->id, 0])
-			->whereIn('school_id', [$school->id, 0])
-			->whereT
-			->orderBy('school_id')->orderBy('stakeholder_id')->get();
-	}
-
-	public function currentIndicator($subcapabilityId, $first = false)
+	public function nextIndicator(Subcapability $subcapability, Indicator $indicator = null)
 	{
-		$builder = Indicator::where([
-			'subcapability_id' => $subcapabilityId,
-		]);
-		if ($first)
-			$builder->where('id', '>', 0);
-		else
-			$builder->where('id', '>', $this->indicator_id);
-		return $builder->first();
-	}
-
-	public function getNextIndicator()
-	{
-		$indicator = $this->currentIndicator($this->indicator->subcapability_id);
+		$indicatorId = $indicator ? $indicator->id : 0;
+		$indicator = Indicator::where('id', '>', $indicatorId)
+			->whereSubcapabilityId($subcapability->id)
+			->orderBy('id')->first();
 		if (!$indicator) {
-			$subcapability = $this->currentSubcapability($this->indicator->subcapability->capability_id);
-			if (!$subcapability) {
-				$capability = $this->currentCapability();
-				if (!$capability)
-				{
-					$schoolCapabilityScore = new SurveyScore();
-					$schoolCapabilityScore->generateScores($this);
-					$this->save();
-					return;
-				}
-				$subcapability = $this->currentSubcapability($capability->id, true);
-				if (!$subcapability)
-				{
-					$schoolCapabilityScore = new SurveyScore();
-					$schoolCapabilityScore->generateScores($this);
-					$this->save();
-					return;
-				}
-			}
-			$indicator = $this->currentIndicator($subcapability->id, true);
+			$subcapability = $this->nextSubcapability($subcapability->capability, $subcapability);
+			if (!$subcapability)
+				return null;
+			return $this->nextIndicator($subcapability);
+		}
+
+		$indicator = (new OverrideCapability())
+			->getModelOverrides(Collection::make([$indicator]), $this->school_id, $this->stakeholder_id)->first();
+		if (!$indicator->is_visible)
+			return $this->nextIndicator($subcapability, $indicator);
+
+		return $indicator;
+	}
+
+	public function setNextIndicator()
+	{
+		$indicator = $this->getNextIndicator();
+		if (is_null($indicator))
+		{
+			$schoolCapabilityScore = new SurveyScore();
+			$schoolCapabilityScore->generateScores($this);
+			$this->save();
 		}
 		$this->indicator_id = $indicator->id;
 		$this->save();
+	}
+
+	public function initialize()
+	{
+		$capability = $this->nextCapability();
+		$subcapability = $this->nextSubcapability($capability);
+		$this->indicator_id = $this->nextIndicator($subcapability)->id;
 	}
 }

@@ -17,10 +17,17 @@
 @section('content')
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="{{route('capabilities', ['stakeholder_id' => request()->get('stakeholder_id')])}}">Capabilities</a>
+            <a href="{{route('capabilities', [
+	                    'stakeholder_id' => request()->get('stakeholder_id'),
+	                    'school_id' => request()->get('school_id')
+	        ])}}">Capabilities</a>
         </li>
         <li class="breadcrumb-item">
-            <a href="{{route('subcapabilities', ['capability' => $capability->id, 'stakeholder_id' => request()->get('stakeholder_id')])}}">
+            <a href="{{route('subcapabilities', [
+	                'capability' => $capability->id,
+	                'stakeholder_id' => request()->get('stakeholder_id'),
+                    'school_id' => request()->get('school_id')
+	        ])}}">
                 {{$capability->name}}
             </a>
         </li>
