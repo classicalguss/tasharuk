@@ -76,6 +76,7 @@ class Survey extends Model
 		$indicator = Indicator::where('id', '>', $indicatorId)
 			->whereSubcapabilityId($subcapability->id)
 			->orderBy('id')->first();
+
 		if (!$indicator) {
 			$subcapability = $this->nextSubcapability($subcapability->capability, $subcapability);
 			if (!$subcapability)
@@ -93,15 +94,45 @@ class Survey extends Model
 
 	public function setNextIndicator()
 	{
-		$indicator = $this->getNextIndicator();
+		$indicator = $this->nextIndicator($this->indicator->subcapability, $this->indicator);
 		if (is_null($indicator))
 		{
 			$schoolCapabilityScore = new SurveyScore();
 			$schoolCapabilityScore->generateScores($this);
 			$this->save();
+			return;
 		}
 		$this->indicator_id = $indicator->id;
 		$this->save();
+	}
+
+	public function calculateCountOfQuestions() {
+		$count = 0;
+		$capabilities = Capability::all();
+		$capabilities = (new OverrideCapability())
+			->getModelOverrides(Collection::make($capabilities), $this->school_id, $this->stakeholder_id);
+
+		foreach ($capabilities as $capability) {
+			if (!$capability->is_visible)
+				continue;
+			$subcapabilities = $capability->subcapabilities;
+			$subcapabilities = (new OverrideCapability())
+				->getModelOverrides(Collection::make($subcapabilities), $this->school_id, $this->stakeholder_id);
+
+			foreach ($subcapabilities as $subcapability) {
+				if (!$subcapability->is_visible)
+					continue;
+				$indicators = $subcapability->indicators;
+				$indicators = (new OverrideCapability())
+					->getModelOverrides(Collection::make($indicators), $this->school_id, $this->stakeholder_id);
+				foreach ($indicators as $indicator) {
+					if (!$indicator->is_visible)
+						continue;
+					$count++;
+				}
+			}
+		}
+		return $count;
 	}
 
 	public function initialize()
@@ -109,5 +140,6 @@ class Survey extends Model
 		$capability = $this->nextCapability();
 		$subcapability = $this->nextSubcapability($capability);
 		$this->indicator_id = $this->nextIndicator($subcapability)->id;
+		$this->count_of_questions = $this->calculateCountOfQuestions();
 	}
 }

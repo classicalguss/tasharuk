@@ -390,6 +390,12 @@ function toggleVisibility(el) {
             $(el).parents('tr').addClass('text-muted');
             $(el).parents('.indicator-wrapper').attr('data-visible',el.dataset.visible);
         }
+    } else {
+        if (el.dataset.visible == 0) {
+            let slider = $(el).parents('tr').find('.slider-dynamic')[0];
+            slider.noUiSlider.set(0);
+            changeSliderWeightCallback(slider, 0);
+        }
     }
     axios({
         method: 'put',
@@ -441,35 +447,38 @@ function activateSliders() {
 
             dynamicSlider.noUiSlider.on('change', function (values, handle) {
                 //Confirm by putting it in the dataset
-                let oldWeight = dynamicSlider.dataset.weight;
-                let newWeight = values[0];
-                let difference = newWeight - oldWeight;
-                currentSum += difference;
-
-                showWeightsButton();
-                if (currentSum > 100) {
-                    dynamicSlider.noUiSlider.set(dynamicSlider.dataset.weight);
-                }
-                else {
-                    dynamicSlider.dataset.weight = values[0];
-                }
-                for (let i = 0; i < allSliders.length; i++) {
-                    allSliders[i].noUiSlider.updateOptions({
-                        range: {
-                            min: 0,
-                            max: parseInt(allSliders[i].dataset.weight) + (100 - currentSum)
-                        }
-                    })
-                    if (currentSum === 100) {
-                        allSliders[i].classList.remove('noUi-target');
-                        allSliders[i].classList.add('noUi-success');
-                    } else {
-                        allSliders[i].classList.remove('noUi-success');
-                        allSliders[i].classList.add('noUi-target');
-                    }
-                }
+                changeSliderWeightCallback(dynamicSlider, values[0]);
             });
             allSliders.push(dynamicSlider);
+        }
+    }
+}
+
+function changeSliderWeightCallback(dynamicSlider, newWeight) {
+    let oldWeight = dynamicSlider.dataset.weight;
+    let difference = newWeight - oldWeight;
+    currentSum += difference;
+
+    showWeightsButton();
+    if (currentSum > 100) {
+        dynamicSlider.noUiSlider.set(dynamicSlider.dataset.weight);
+    }
+    else {
+        dynamicSlider.dataset.weight = newWeight;
+    }
+    for (let i = 0; i < allSliders.length; i++) {
+        allSliders[i].noUiSlider.updateOptions({
+            range: {
+                min: 0,
+                max: parseInt(allSliders[i].dataset.weight) + (100 - currentSum)
+            }
+        })
+        if (currentSum === 100) {
+            allSliders[i].classList.remove('noUi-target');
+            allSliders[i].classList.add('noUi-success');
+        } else {
+            allSliders[i].classList.remove('noUi-success');
+            allSliders[i].classList.add('noUi-target');
         }
     }
 }

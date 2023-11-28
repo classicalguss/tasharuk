@@ -27,18 +27,14 @@ class SurveyController extends Controller
 	public function index(Request $request) {
 		$limit = $request->input('length');
 		$start = $request->input('start');
+		$surveys = Survey::with('school', 'stakeholder')
+			->offset($start)
+			->limit($limit);
 		$totalData = Survey::count();
 		$totalFiltered = $totalData;
-		if (empty($request->input('search.value'))) {
-			$surveys = Survey::with('school', 'stakeholder')->limit($limit);
-		} else {
-			$search = $request->input('search.value');
-
-			$surveys = Survey::with('school', 'stakeholder')
-				->where('receiver_email', 'LIKE', "%{$search}%")
-				->offset($start)
-				->limit($limit);
-
+		$search = $request->input('search.value');
+		if ($search) {
+			$surveys->where('receiver_email', 'LIKE', "%{$search}%");
 			$totalFiltered = Survey::where('receiver_email', 'LIKE', "%{$search}%")
 				->count();
 		}
@@ -85,7 +81,8 @@ class SurveyController extends Controller
 				'status' => 'not_started',
 				"created_at" => date('Y-m-d H:i:s'),
 				"updated_at" => date('Y-m-d H:i:s'),
-				'invitation_token' => $token
+				'invitation_token' => $token,
+				'count_of_questions' => $survey->count_of_questions
 			];
 			Mail::to($email['value'])->send(new SurveyMailer($school->name, $token));
 		}
@@ -101,7 +98,7 @@ class SurveyController extends Controller
 		$surveyAnswer->score = $request->post('rate');
 		$surveyAnswer->indicator_id = $survey->indicator_id;
 		$surveyAnswer->save();
-		$survey->getNextIndicator();
+		$survey->setNextIndicator();
 		return redirect()->back();
 	}
 
@@ -123,7 +120,7 @@ class SurveyController extends Controller
 			$survey->save();
 		}
 
-		$indicatorsCount = Indicator::count();
+		$indicatorsCount = $survey->count_of_questions;
 		$surveyAnswers = SurveyAnswer::whereSurveyId($survey->id)->count();
 		$progress = (($surveyAnswers + 1) / ($indicatorsCount + 1)) * 100;
 
