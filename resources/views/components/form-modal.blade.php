@@ -20,7 +20,7 @@
                             <div class="row">
                                 <div class="col mb-3">
                                     <input type="text" name="{{$field['name']}}" id="{{$field['name']}}-form-id" class="form-control"
-                                           placeholder="Enter {{str_replace('_', ' ', ucfirst($field['name']))}}" required>
+                                           placeholder="Enter {{str_replace('_', ' ', ucfirst($field['name']))}}" @if(!isset($field['optional'])) required @endif>
                                 </div>
                             </div>
                     @elseif($field['type'] == 'select')

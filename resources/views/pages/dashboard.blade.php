@@ -178,7 +178,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center pb-0">
                         <div>
-                            <h5 class="card-title mb-0">{{Str::title($stakeholder)}}</h5>
+                            <h5 class="card-title mb-0">{{ucfirst(str_replace('_', ' ',$stakeholder))}}</h5>
                             <small class="text-muted">From {{$surveyStats['Completed']}} surveys</small>
                         </div>
                     </div>
@@ -196,7 +196,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center pb-0">
                         <div>
-                            <h5 class="card-title mb-0">{{Str::title($capability)}}</h5>
+                            <h5 class="card-title mb-0">{{ucfirst(str_replace('_', ' ', $capability))}}</h5>
                             <small class="text-muted">From {{$surveyStats['Completed']}} surveys</small>
                         </div>
                     </div>

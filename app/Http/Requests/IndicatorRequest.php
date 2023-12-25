@@ -23,11 +23,11 @@ class IndicatorRequest extends FormRequest
     {
         return [
 			'text' => 'string|required',
-			'highly_effective' => 'string',
-			'effective' => 'string',
-			'satisfactory' => 'string',
-			'needs_improvement' => 'string',
-			'does_not_meet_standard' => 'string'
+			'highly_effective' => 'string|nullable',
+			'effective' => 'string|nullable',
+			'satisfactory' => 'string|nullable',
+			'needs_improvement' => 'string|nullable',
+			'does_not_meet_standard' => 'string|nullable'
         ];
     }
 }

@@ -70,11 +70,11 @@
             'url' => url('resource/subcapabilities/'.$subcapability->id.'/indicators'),
             'fields' => [
                 ['name' => 'text', 'type' => 'text'],
-                ['name' => 'highly_effective', 'type' => 'text'],
-                ['name' => 'effective', 'type' => 'text'],
-                ['name' => 'satisfactory', 'type' => 'text'],
-                ['name' => 'needs_improvement', 'type' => 'text'],
-                ['name' => 'does_not_meet_standard', 'type' => 'text']
+                ['name' => 'highly_effective', 'type' => 'text', 'optional' => true],
+                ['name' => 'effective', 'type' => 'text', 'optional' => true],
+                ['name' => 'satisfactory', 'type' => 'text', 'optional' => true],
+                ['name' => 'needs_improvement', 'type' => 'text', 'optional' => true],
+                ['name' => 'does_not_meet_standard', 'type' => 'text', 'optional' => true]
             ]
         ])
     @endif

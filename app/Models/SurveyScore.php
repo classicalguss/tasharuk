@@ -51,7 +51,7 @@ class SurveyScore extends Model
 			$capabilityScore->school_id = $survey->school_id;
 			$capabilityScore->stakeholder_id = $survey->stakeholder_id;
 			$capabilityScore->capability_id = $key;
-			$capabilityScore->score = round($score);
+			$capabilityScore->score = round($score, 1);
 			$capabilityScore->save();
 		}
 

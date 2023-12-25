@@ -63,7 +63,7 @@ class DashboardController extends Controller
 		//Overall School Averages
 		$capabilityAverages = [];
 		foreach ($capabilityScores as $key => $scores) {
-			$capabilityAverages[$key] = round(array_sum($scores) / count($scores));
+			$capabilityAverages[$key] = round(array_sum($scores) / count($scores), 1);
 		}
 
 		//Stakeholders Averages
@@ -94,8 +94,7 @@ class DashboardController extends Controller
 			$capabilityName = preg_replace('/[^A-Za-z0-9\-_]/', '', $capabilityName);
 			$capabilityStakeholdersAveragesChartData[$capabilityName] = [];
 			foreach ($averages as $average) {
-				$stakeholderName = Str::snake($stakeholders[$average['stakeholder_id']]);
-				$stakeholderName = preg_replace('/[^A-Za-z0-9\-_]/', '', $stakeholderName);
+				$stakeholderName = $stakeholders[$average['stakeholder_id']];
 				$capabilityStakeholdersAveragesChartData[$capabilityName][$stakeholderName] = $average['average'];
 			}
 		}
