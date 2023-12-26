@@ -116,15 +116,17 @@
 												$tempSubcapabilityArray = [];
                                             ?>
                                             @foreach($capability->subcapabilities as $subcapability)
-                                                <?php
-													$tempSubcapabilityArray[$subcapability->name] = $subcapabilitiesScores[$subcapability->id] * 20;
-                                                    $surveyGraphScores[$capability->id] = $tempSubcapabilityArray;
-                                                    ?>
-                                                <tr>
-                                                    <td>{{$subcapability->name}}</td>
-                                                    <td>{{$subcapability->weight}}%</td>
-                                                    <td>{{$subcapabilitiesScores[$subcapability->id]/5*$subcapability->weight}}</td>
-                                                </tr>
+                                                @if (isset($subcapabilitiesScores[$subcapability->id]))
+														<?php
+														$tempSubcapabilityArray[$subcapability->name] = $subcapabilitiesScores[$subcapability->id] * 20;
+														$surveyGraphScores[$capability->id] = $tempSubcapabilityArray;
+														?>
+                                                    <tr>
+                                                        <td>{{$subcapability->name}}</td>
+                                                        <td>{{$subcapability->weight}}%</td>
+                                                        <td>{{$subcapabilitiesScores[$subcapability->id]/5*$subcapability->weight}}</td>
+                                                    </tr>
+                                                @endif
 
                                             @endforeach
                                         </table>
