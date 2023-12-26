@@ -61,6 +61,7 @@ class SurveyScore extends Model
 		$surveyScore->score = $surveyTotalScore;
 		$surveyScore->survey_id = $survey->id;
 		$surveyScore->stakeholder_id = $survey->stakeholder_id;
+		$surveyScore->school_id = $survey->school_id;
 		$surveyScore->save();
 
 		$survey->status = 'completed';
