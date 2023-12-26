@@ -45,6 +45,7 @@ class SurveyScore extends Model
 				$capabilityScores[$capabilityId] = $weightedScore;
 		}
 
+		$surveyTotalScore = 0;
 		foreach ($capabilityScores as $key => $score) {
 			$capabilityScore = new SurveyCapabilityScore();
 			$capabilityScore->survey_id = $survey->id;
@@ -52,11 +53,17 @@ class SurveyScore extends Model
 			$capabilityScore->stakeholder_id = $survey->stakeholder_id;
 			$capabilityScore->capability_id = $key;
 			$capabilityScore->score = round($score, 1);
+			$surveyTotalScore += $score / 100 * $capabilities[$key]->weight;
 			$capabilityScore->save();
 		}
 
+		$surveyScore = new SurveyScore();
+		$surveyScore->score = $surveyTotalScore;
+		$surveyScore->survey_id = $survey->id;
+		$surveyScore->stakeholder_id = $survey->stakeholder_id;
+		$surveyScore->save();
+
 		$survey->status = 'completed';
 		$survey->save();
-
 	}
 }

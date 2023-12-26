@@ -10,6 +10,7 @@ use App\Models\Stakeholder;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
 use App\Models\SurveyCapabilityScore;
+use App\Models\SurveyScore;
 use App\Models\SurveySubcapabilityScore;
 use Illuminate\Http\Request;
 
@@ -79,12 +80,19 @@ class SchoolController extends Controller
 
 	public function generateReport(School $school)
 	{
-		$capabilities = Capability::whereId(1)->get();
+		$capabilities = Capability::all()->keyBy('id');
 		$surveyIds = Survey::whereSchoolId($school->id)->get()->pluck('id');
 
-		$surveyScores = SurveyCapabilityScore::selectRaw('capability_id, round(avg(score), 2) as average')
+		$surveyCapabilityScores = SurveyCapabilityScore::selectRaw('capability_id, round(avg(score), 2) as average')
 			->whereIn('survey_id', $surveyIds)->groupBy('capability_id')->get()->toArray();
-		$surveyScores = array_column($surveyScores, 'average', 'capability_id');
+		$surveyCapabilityScores = array_column($surveyCapabilityScores, 'average', 'capability_id');
+
+		$capabilityScores = [];
+		foreach ($surveyCapabilityScores as $key => $score) {
+			$capabilityScores[$capabilities[$key]->name] = $score;
+		}
+
+		$overallScore = SurveyScore::whereSchoolId($school->id)->average('score');
 
 		$surveySubcapabilitiesScore = SurveySubcapabilityScore::selectRaw('subcapability_id, avg(score) as average')
 			->whereIn('survey_id', $surveyIds)->groupBy('subcapability_id')->get()->toArray();
@@ -107,15 +115,16 @@ class SchoolController extends Controller
 				$indicatorStakeholdersAverages[$indicatorId][$stakeholder->id] = round($average, 2);
 			}
 		}
-		logger($subcapabilitiesScores);
 
 		return view('pages.schools.report', [
 			'school' => $school,
 			'capabilities' => $capabilities,
+			'capabilityScores' => $capabilityScores,
 			'subcapabilitiesScores' => $subcapabilitiesScores,
 			'stakeholders' => $stakeholders,
 			'indicatorStakeholdersAverages' => $indicatorStakeholdersAverages,
-			'surveyScores' => $surveyScores
+			'surveyCapabilityScores' => $surveyCapabilityScores,
+			'overallScore' => $overallScore
 		]);
 	}
 

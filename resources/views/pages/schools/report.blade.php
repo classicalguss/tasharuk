@@ -90,7 +90,7 @@
                                     <div class="col-md-8 overall-chart">
 
                                     </div>
-                                    <div style="padding-bottom: 100px" class="d-flex align-items-center col-md-4 overall-radial"></div>
+                                    <div style="padding-bottom: 100px" class="d-flex align-items-center col-md-4 overall-score"></div>
                                 </div>
                             </div>
                             <div class="divider my-4">
@@ -193,20 +193,23 @@
 
 @push('scripts')
     <script>
+        overallScore = {{$overallScore}};
+        renderRadial('overall-score', overallScore);
         capabilities = {{JS::from($capabilities)}};
-        surveyScores = {{JS::from($surveyScores)}};
+        surveyScores = {{JS::from($surveyCapabilityScores)}};
         subcapabilityScores = [];
         subcapabilityGraphScores = {{JS::from($surveyGraphScores)}};
         console.log(subcapabilityGraphScores);
 
-        for (let key in subcapabilityGraphScores)
-        {
-            renderHorizontalChart('capability-'+key+'-chart', subcapabilityGraphScores[key]);
-        }
+        renderHorizontalChart('overall-chart', {{Js::from($capabilityScores)}}, '300px')
+        // for (let key in subcapabilityGraphScores)
+        // {
+        //     renderHorizontalChart('capability-'+key+'-chart', subcapabilityGraphScores[key]);
+        // }
 
-        for (let key in surveyScores)
-        {
-            renderRadial('capability-'+key+'-radial', surveyScores[key]);
-        }
+        // for (let key in surveyScores)
+        // {
+        //     renderRadial('capability-'+key+'-radial', surveyScores[key]);
+        // }
     </script>
 @endpush

@@ -212,6 +212,7 @@
         overallScore = {{$overallScore}};
         renderRadial('overall-score', overallScore);
         renderDonutChart('surveyStats', {{Js::from($surveyStats)}})
+
         renderHorizontalChart('school-performance', {{Js::from($capabilitiesPerformance)}}, '300px')
         stakeholdersPerformance = {{Js::from($stakeholdersAverages)}};
         for (let key in stakeholdersPerformance) {
