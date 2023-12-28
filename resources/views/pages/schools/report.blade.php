@@ -124,7 +124,7 @@
                                                     <tr>
                                                         <td>{{$subcapability->name}}</td>
                                                         <td>{{$subcapability->weight}}%</td>
-                                                        <td>{{$subcapabilitiesScores[$subcapability->id]/5*$subcapability->weight}}</td>
+                                                        <td>{{round($subcapabilitiesScores[$subcapability->id]/100 * $subcapability->weight, 2)}}</td>
                                                     </tr>
                                                 @endif
 
