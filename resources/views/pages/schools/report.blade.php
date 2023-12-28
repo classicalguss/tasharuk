@@ -200,18 +200,17 @@
         capabilities = {{JS::from($capabilities)}};
         surveyScores = {{JS::from($surveyCapabilityScores)}};
         subcapabilityScores = [];
-        subcapabilityGraphScores = {{JS::from($surveyGraphScores)}};
-        console.log(subcapabilityGraphScores);
+        capabilitySubcapabilityScores = {{JS::from($capabilitySubcapabilityScores)}};
 
         renderHorizontalChart('overall-chart', {{Js::from($capabilityScores)}}, '300px')
-        // for (let key in subcapabilityGraphScores)
-        // {
-        //     renderHorizontalChart('capability-'+key+'-chart', subcapabilityGraphScores[key]);
-        // }
+        for (let key in capabilitySubcapabilityScores)
+        {
+            renderHorizontalChart('capability-'+key+'-chart', capabilitySubcapabilityScores[key]);
+        }
 
-        // for (let key in surveyScores)
-        // {
-        //     renderRadial('capability-'+key+'-radial', surveyScores[key]);
-        // }
+        for (let key in surveyScores)
+        {
+            renderRadial('capability-'+key+'-radial', surveyScores[key]);
+        }
     </script>
 @endpush

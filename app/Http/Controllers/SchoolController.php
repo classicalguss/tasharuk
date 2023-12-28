@@ -7,6 +7,7 @@ use App\Models\Indicator;
 use App\Models\School;
 use App\Models\SchoolStakeholderWeight;
 use App\Models\Stakeholder;
+use App\Models\Subcapability;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
 use App\Models\SurveyCapabilityScore;
@@ -81,6 +82,8 @@ class SchoolController extends Controller
 	public function generateReport(School $school)
 	{
 		$capabilities = Capability::all()->keyBy('id');
+		/** @var Subcapability[] $subcapabilities */
+		$subcapabilities = Subcapability::all()->keyBy('id');
 		$surveyIds = Survey::whereSchoolId($school->id)->get()->pluck('id');
 
 		$surveyCapabilityScores = SurveyCapabilityScore::selectRaw('capability_id, round(avg(score), 2) as average')
@@ -96,7 +99,13 @@ class SchoolController extends Controller
 
 		$surveySubcapabilitiesScore = SurveySubcapabilityScore::selectRaw('subcapability_id, avg(score) as average')
 			->whereIn('survey_id', $surveyIds)->groupBy('subcapability_id')->get()->toArray();
-		$subcapabilitiesScores = array_column($surveySubcapabilitiesScore, 'average', 'subcapability_id');
+		$surveySubcapabilitiesScore = array_column($surveySubcapabilitiesScore, 'average', 'subcapability_id');
+
+		$capabilitySubcapabilityScores = [];
+		foreach ($surveySubcapabilitiesScore as $key => $score) {
+			$subcapability = $subcapabilities[$key];
+			$capabilitySubcapabilityScores[$subcapability->capability_id][$subcapability->name] = $score;
+		}
 
 		$stakeholders = Stakeholder::all();
 		$indicatorStakeholdersAverages = [];
@@ -119,8 +128,9 @@ class SchoolController extends Controller
 		return view('pages.schools.report', [
 			'school' => $school,
 			'capabilities' => $capabilities,
+			'subcapabilitiesScores' => $surveySubcapabilitiesScore,
 			'capabilityScores' => $capabilityScores,
-			'subcapabilitiesScores' => $subcapabilitiesScores,
+			'capabilitySubcapabilityScores' => $capabilitySubcapabilityScores,
 			'stakeholders' => $stakeholders,
 			'indicatorStakeholdersAverages' => $indicatorStakeholdersAverages,
 			'surveyCapabilityScores' => $surveyCapabilityScores,
