@@ -99,6 +99,7 @@ class Survey extends Model
 		{
 			$schoolCapabilityScore = new SurveyScore();
 			$schoolCapabilityScore->generateScores($this);
+			$this->completed_at = now();
 			$this->save();
 			return;
 		}

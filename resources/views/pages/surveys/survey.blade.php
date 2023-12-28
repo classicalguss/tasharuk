@@ -15,7 +15,7 @@
     <div class="container mt-1">
         <div class="row d-flex justify-content-center">
             <div class="col-md-10">
-                <div class="justify-content-center px-5 py-5" id="form1">
+                <div class="justify-content-center py-5" id="form1">
                     <div class="app-brand justify-content-center mb-3">
                         @include('_partials.macros')
                     </div>

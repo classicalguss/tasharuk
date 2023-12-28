@@ -16,12 +16,12 @@
     <div class="container mt-1">
         <div class="row d-flex justify-content-center">
             <div class="col-md-10">
-                <div class="justify-content-center px-5 py-5" id="form1">
+                <div class="justify-content-center py-5" id="form1">
                     <div class="app-brand justify-content-center mb-5">
                         @include('_partials.macros')
                     </div>
                     <div class="row justify-content-center">
-                        <div class="card col-4">
+                        <div class="card col-md-4">
                             <div class="card-body">
                                 <div class="swal2-icon swal2-success swal2-icon-show" style="display: flex;"><div class="swal2-success-circular-line-left" style="background-color: rgb(255, 255, 255);"></div>
                                     <span class="swal2-success-line-tip"></span> <span class="swal2-success-line-long"></span>
