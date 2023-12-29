@@ -24,7 +24,7 @@
     <h2>Generate report for {{$school->name}}</h2>
 
     <div class="row">
-        <div class="col-md-9 p-4">
+        <div class="col-12 p-4">
             <div class="card">
                 <div class="card-header px-4 p-3 sticky-element bg-label-secondary d-flex justify-content-sm-between align-items-sm-center flex-column flex-sm-row mb-3">
                     <h5 class="card-title mb-sm-0 me-2">Actions</h5>
