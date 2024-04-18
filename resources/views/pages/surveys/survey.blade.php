@@ -21,7 +21,7 @@
                     </div>
                     @if($isFirst)
                         <div class="row justify-content-center">
-                            <div class="card col-4">
+                            <div class="card col-md-4">
                                 <div class="card-body">
                                     <p class="mb-5">Welcome to our Survey. Please press Next to proceed with the first question.</p>
                                     <div class="col-12 d-flex justify-content-between">

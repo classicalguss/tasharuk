@@ -8,15 +8,23 @@ function deleteRecord(el) {
     })
 }
 
+globalTarget;
 function setUpdateModal() {
     $('#updateModal').on('show.bs.modal', function(e) {
         //get data-id attribute of the clicked element
         var name = $(e.relatedTarget).data('name');
         var id = $(e.relatedTarget).data('id');
+        console.log("focusing >>>");
 
+        globalTarget = e;
+
+        $(this).find('input[type=text]').focus();
+        $(e.currentTarget).find('input[type=text]').focus();
         //populate the textbox
-        if (name)
+        if (name) {
             $(e.currentTarget).find('input[name="name"]').val(name);
+            $(e.currentTarget).find('input[name="name"]').focus();
+        }
         if (id)
             $(e.currentTarget).find('form').attr('action', $(e.currentTarget).find('form').attr('action')+`/${id}` )
     });
