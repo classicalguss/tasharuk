@@ -35,7 +35,6 @@ Route::get('/pages/misc-error', $controller_path . '\pages\MiscError@index')->na
 Route::get('/survey/completed', [SurveyController::class, 'completed'])->name('surveys.done');
 Route::view('/surveys/close', 'pages.surveys.close')->name('survey.close');
 Route::get('/survey', [SurveyController::class, 'survey'])->name('survey');
-Route::get('/surveys/{survey}', [SurveyController::class, 'show'])->name('survey.view');
 Route::post('/surveys/{survey}/rate', [SurveyController::class, 'rate'])->name('surveys.rate');
 Route::get('/landing-page', function() {
 	$webMetrics = WebsiteMetrics::first();
@@ -68,6 +67,7 @@ Route::middleware([
 		Route::get('/capabilities', [CapabilityController::class, 'CapabilityManagement'])->name('capabilities');
 		Route::get('/surveys/send', [SurveyController::class, 'sendPage'])->name('surveySend');
 		Route::post('/surveys/send', [SurveyController::class, 'send'])->name('sendSurvey');
+		Route::get('/surveys/{survey}', [SurveyController::class, 'show'])->name('survey.view');
 		Route::get('/surveys', [SurveyController::class, 'SurveyManagement'])->name('surveys');
 	Route::get('/users/invite', [UserController::class, 'userInvite'])->name('users.invite');
 	Route::post('/users/invite', [UserController::class, 'inviteUser'])->name('users.send-invite');
