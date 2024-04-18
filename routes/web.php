@@ -35,6 +35,7 @@ Route::get('/pages/misc-error', $controller_path . '\pages\MiscError@index')->na
 Route::get('/survey/completed', [SurveyController::class, 'completed'])->name('surveys.done');
 Route::view('/surveys/close', 'pages.surveys.close')->name('survey.close');
 Route::get('/survey', [SurveyController::class, 'survey'])->name('survey');
+Route::get('/surveys/{survey}', [SurveyController::class, 'show'])->name('survey.view');
 Route::post('/surveys/{survey}/rate', [SurveyController::class, 'rate'])->name('surveys.rate');
 Route::get('/landing-page', function() {
 	$webMetrics = WebsiteMetrics::first();

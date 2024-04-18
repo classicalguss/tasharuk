@@ -1,10 +1,15 @@
+<?php
+use App\Models\Survey;
+/**
+ * @var Survey $survey
+ */
+?>
 @extends('layouts.layoutMaster')
 
 @section('title', 'User Management')
 
 @section('vendor-style')
     <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
-    <link rel="stylesheet" href="{{asset('assets/vendor/libs/animate-css/animate.css')}}">
 @endsection
 
 @section('vendor-script')
@@ -16,32 +21,32 @@
 @endsection
 
 @section('content')
+    @include("components.breadcrumbs", ["breadcrumbs" => [
+	    ['text' => 'Surveys', 'url' => route('surveys.index')],
+        ['text' => $survey->stakeholder->name.' - '.$survey->receiver_email, 'active' => true]
+    ]])
     <div class="card">
         <div class="card-datatable table-responsive">
             <table class="datatables-items table border-top">
                 <thead>
                     <tr>
-                        <th>Email</th>
-                        <th>Stakeholder</th>
-                        <th>School</th>
-                        <th>Status</th>
-                        <th>Sent at</th>
-                        <th>Completed at</th>
-                        <th>Actions</th>
+                        <th>Capability</th>
+                        <th>Subcapability</th>
+                        <th>Indicator</th>
+                        <th>Score</th>
                     </tr>
                 </thead>
             </table>
         </div>
-    </div>
-    <div id="slider-wrapper" class="card-body hide">
-        <div class="slider-dynamic"></div>
     </div>
 @endsection
 
 @once
     @push('scripts')
         <script>
-            prepareSurveysTable();
+            $(document).ready(function () {
+                prepareSurveyScoresTable({{ $survey->id }});
+            })
         </script>
     @endpush
 @endonce

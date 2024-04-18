@@ -24,6 +24,29 @@ class SurveyController extends Controller
 		return view('pages.surveys');
 	}
 
+	public function show(Survey $survey, Request $request)
+	{
+		if ($request->ajax()) {
+			$limit = $request->input('length');
+			$start = $request->input('start');
+			$surveyAnswers = SurveyAnswer::with('indicator', 'indicator.subcapability.capability', 'indicator.subcapability')
+				->whereSurveyId($survey->id)
+				->offset($start)
+				->limit($limit)
+				->get();
+			$surveyAnswersCount = SurveyAnswer::with('indicator', 'indicator.subcapability.capability', 'indicator.subcapability')
+				->whereSurveyId($survey->id)->count();
+
+			return response()->json([
+				'code' => 200,
+				'data' => $surveyAnswers,
+				'recordsFiltered' => $surveyAnswersCount,
+				'recordsTotal' => $surveyAnswersCount
+			]);
+		}
+		return view('pages.surveys.view', ['survey' => $survey]);
+	}
+
 	public function index(Request $request) {
 		$limit = $request->input('length');
 		$start = $request->input('start');

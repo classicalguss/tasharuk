@@ -1,3 +1,45 @@
+function prepareSurveyScoresTable(id)
+{
+    const surveys_table = $('.datatables-items');
+
+    $.extend($.fn.dataTableExt.oStdClasses, {
+        "sFilterInput": "form-control",
+        "sLengthSelect": "form-control"
+    });
+    // ajax setup
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    console.log("getting here")
+        var dt_survey = surveys_table.DataTable({
+            processing: false,
+            serverSide: true,
+            responsive: true,
+            fixedColumns: true,
+            ajax: {
+                url: baseUrl + 'resource/surveys/'+id
+            },
+            columns: [
+                // columns according to JSON
+                {data: 'indicator.subcapability.capability.name'},
+                {data: 'indicator.subcapability.name'},
+                {data: 'indicator.text'},
+                {data: 'score'},
+            ],
+            ordering: false,
+            searching: false,
+            order: [],
+            language: {
+                sLengthMenu: '_MENU_',
+                search: '',
+                searchPlaceholder: 'Search..'
+            },
+        });
+}
+
 function prepareSurveysTable() {
 // Variable declaration for table
     const surveys_table = $('.datatables-items');
@@ -33,6 +75,19 @@ function prepareSurveysTable() {
                 {data: 'status'},
                 {data: 'created_at'},
                 {data: 'completed_at'},
+                {data: null},
+            ],
+            columnDefs: [
+                {
+                    // Actions
+                    targets: 6,
+                    width: "10%",
+                    title: 'Actions',
+                    render: function (data, type, full, meta) {
+                        console.log(full);
+                        return renderActions(full);
+                    }
+                }
             ],
             ordering: false,
             order: [],
@@ -64,3 +119,11 @@ $(".tagify").bind('paste', function(e) {
         var text = elem.val();
     }, 100);
 });
+
+function renderActions(full) {
+    return (
+        '<div class="d-inline-block text-nowrap">' +
+        `<a href="/surveys/${full['id']}" title="View survey" class="btn btn-sm btn-icon"><i class="bx bx-show"></i></a>` +
+        '</div>'
+    );
+}
