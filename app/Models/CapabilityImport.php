@@ -33,19 +33,30 @@ class CapabilityImport implements ToCollection
 			if (!is_null($row[2]))
 				$capabilities[$capability][$subcapability][] = $row->slice(2)->values();
 		}
+		$capabilityCounter = 1;
 		foreach ($capabilities as $key => $subcapabilities) {
+			$weight = (int)(100 / count($capabilities));
+			if ($capabilityCounter <= (100 % count($capabilities))) {
+				$weight++;
+			}
+			$capabilityCounter++;
 			$capability = Capability::create([
 				'name' => $key,
-				'weight' => (int)(100 / count($capabilities))
+				'weight' => $weight
 			]);
+			$subcapabilityCounter = 1;
 			foreach ($subcapabilities as $key => $indicators) {
+				$weight = (int)(100 / count($subcapabilities));
+				if ($subcapabilityCounter <= (100 % count($subcapabilities))) {
+					$weight++;
+				}
+				$subcapabilityCounter++;
 				$subcapability = Subcapability::create([
 					'capability_id' => $capability->id,
 					'name' => $key,
-					'weight' => (int)(100 / count($subcapabilities))
+					'weight' => $weight
 				]);
 				foreach ($indicators as $indicator) {
-					logger($indicator[1]);
 					Indicator::create([
 						'text' => $indicator[0],
 						'subcapability_id' => $subcapability->id,
